@@ -1,0 +1,14 @@
+<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Köhlbrand Emblem</title>
+  <desc id="desc">Diamant-Pylon der neuen Köhlbrandbrücke mit durchlaufender Fahrbahn und Signallicht, als Bildmarke für Favicon und Profilbilder.</desc>
+
+  <g transform="translate(5,5)">
+    <line x1="45" y1="18" x2="27" y2="66" stroke="#1C3A52" stroke-width="5" stroke-linecap="round"/>
+    <line x1="45" y1="18" x2="63" y2="66" stroke="#1C3A52" stroke-width="5" stroke-linecap="round"/>
+    <line x1="27" y1="66" x2="45" y2="100" stroke="#1C3A52" stroke-width="5" stroke-linecap="round"/>
+    <line x1="63" y1="66" x2="45" y2="100" stroke="#1C3A52" stroke-width="5" stroke-linecap="round"/>
+    <path d="M8,70 Q45,60 82,70" fill="none" stroke="#12242F" stroke-width="5" stroke-linecap="round"/>
+    <line x1="45" y1="18" x2="45" y2="12" stroke="#1C3A52" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="45" cy="10" r="3.4" fill="#E39A3B"/>
+  </g>
+</svg>

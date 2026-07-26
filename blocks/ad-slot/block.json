@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "koehlbrand/ad-slot",
+	"title": "Werbeplatz",
+	"category": "theme",
+	"icon": "megaphone",
+	"description": "Werbeplatz mit reservierter Höhe und fester Kennzeichnung „Anzeige“. Rendert nur, wenn eine AdSense-Publisher-ID hinterlegt oder der Vorschaumodus aktiv ist.",
+	"textdomain": "koehlbrand",
+	"keywords": [ "werbung", "anzeige", "adsense", "banner", "ad" ],
+	"usesContext": [ "queryId" ],
+	"attributes": {
+		"slot": {
+			"type": "string",
+			"default": "in-content"
+		},
+		"interval": {
+			"type": "number",
+			"default": 0
+		},
+		"sticky": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"spacing": { "margin": true }
+	},
+	"editorScript": "koehlbrand-ad-slot-editor"
+}

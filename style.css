@@ -1,0 +1,830 @@
+/*
+Theme Name: Köhlbrand
+Theme URI: https://koehlbrand.de
+Author: Köhlbrand Redaktion
+Author URI: https://koehlbrand.de
+Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle rund um die Köhlbrandbrücke: Neubau-Berichterstattung, Hafenwirtschaft, Ausflugs- und Fototipps. Basierend auf den offiziellen Marken-Guidelines (Dusk-Blau, Sonnenuntergangs-Amber, Barlow Semi Condensed / IBM Plex Sans).
+Requires at least: 6.4
+Tested up to: 6.6
+Requires PHP: 7.4
+Version: 1.2.0
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: koehlbrand
+Tags: block-theme, full-site-editing, news, blog, one-column
+
+Dies ist ein Block-Theme. Layout, Farben und Typografie werden über theme.json
+und die HTML-Templates in /templates und /parts gesteuert. Diese Datei dient
+nur der Theme-Erkennung durch WordPress sowie kleineren Ergänzungen, die sich
+(noch) nicht über theme.json abbilden lassen.
+*/
+
+/* -------------------------------------------------------------------------
+   Silbentrennung in Überschriften
+
+   Deutsche Komposita ("Köhlbrandquerung", "Hafenwirtschaft") sind bei den
+   großen Headline-Graden breiter als die Textspalte auf dem Handy. WordPress
+   setzt auf .wp-block-post-title/.wp-block-heading `word-break: break-word`
+   und bricht solche Wörter deshalb hart und OHNE Trennstrich um.
+
+   Deshalb hier: `hyphens: auto` (greift, weil <html lang="de"> gesetzt ist –
+   siehe index.php/header, ohne die Sprachauszeichnung hätte der Browser keine
+   deutschen Trennmuster) und `word-break: normal`, damit der Kernstil den
+   Trennstrich nicht mehr wegbricht. `overflow-wrap: break-word` bleibt als
+   Notausgang für Browser ohne deutsches Trennwörterbuch stehen: dann bricht
+   das Wort wie bisher hart um, statt aus der Spalte zu laufen.
+   ---------------------------------------------------------------------- */
+
+h1, h2, h3, h4, h5, h6,
+.wp-block-post-title,
+.wp-block-heading,
+.wp-block-site-title {
+	-webkit-hyphens: auto;
+	hyphens: auto;
+	/* Nur echte Langwörter trennen: mind. 8 Zeichen im Wort, mind. 4 vor und
+	   3 nach dem Trennstrich. Verhindert Trennungen wie "Bau-er". */
+	-webkit-hyphenate-limit-before: 4;
+	-webkit-hyphenate-limit-after: 3;
+	hyphenate-limit-chars: 8 4 3;
+	overflow-wrap: break-word;
+	word-break: normal;
+}
+
+/* -------------------------------------------------------------------------
+   Verlinkte Titel/Meta behalten ihre eigene Textfarbe
+
+   theme.json setzt für alle Links `elements.link.color.text: primary`. Bei
+   Blöcken, die komplett aus einem Link bestehen (post-title mit isLink,
+   post-terms, post-date, post-author, site-title), färbt die am Block gesetzte
+   Textfarbe nur das äußere Element – das <a> darin bleibt Dusk-Blau. Auf dem
+   Hero der Startseite steht dieses Dusk-Blau auf Dusk-Blau: Kontrast 1.00, der
+   Titel war nur beim Mouseover zu sehen. Dieselbe Ursache traf das
+   Amber-Rubrik-Label darüber.
+
+   Deshalb: hat der Block eine eigene Textfarbe (.has-text-color), erbt der Link
+   sie. Blöcke ohne gesetzte Farbe bleiben unberührt – die Titel auf den Karten
+   sind weiterhin Dusk-Blau.
+
+   Hover und Fokus unterstreichen, statt auf Amber zu wechseln. Amber trägt auf
+   dem warmen Off-White nur Kontrast 2.1 und wäre dort selbst für große Schrift
+   zu schwach; seit der Aufmacher auf hellem Grund steht, wäre der Farbwechsel
+   also genau an der prominentesten Stelle unlesbar. Die Unterstreichung
+   funktioniert auf beiden Gründen.
+   ---------------------------------------------------------------------- */
+
+:is(
+	.wp-block-post-title,
+	.wp-block-post-terms,
+	.wp-block-post-date,
+	.wp-block-post-author,
+	.wp-block-site-title
+).has-text-color a {
+	color: inherit;
+}
+
+:is(
+	.wp-block-post-title,
+	.wp-block-post-terms,
+	.wp-block-post-date,
+	.wp-block-post-author,
+	.wp-block-site-title
+).has-text-color a:hover,
+:is(
+	.wp-block-post-title,
+	.wp-block-post-terms,
+	.wp-block-post-date,
+	.wp-block-post-author,
+	.wp-block-site-title
+).has-text-color a:focus-visible {
+	color: inherit;
+	text-decoration: underline;
+}
+
+
+/* -------------------------------------------------------------------------
+   Innenabstand für Gruppen mit Hintergrundfarbe
+
+   WordPress gibt jeder Gruppe mit Hintergrund per
+   `:where(.wp-block-group.has-background)` ein Padding von 1.25em/2.375em.
+   Der horizontale Anteil davon wird hier aber wieder abgeräumt: weil
+   `useRootPaddingAwareAlignments` aktiv ist, trägt jede constrained Gruppe die
+   Klasse `has-global-padding`, und der Kern setzt für verschachtelte
+   Vorkommen davon `padding-left/right: 0` (Selektor-Spezifität 0-2-0 schlägt
+   das `:where()` mit 0-0-0). Ergebnis: gemessene 0px links/rechts, der Text
+   klebt am Rand – bei den Rubrik-Karten ebenso wie bei jeder Box, die die
+   REST-API-Pipeline oder die Redaktion anlegt.
+
+   Die Regel stellt den horizontalen Abstand wieder her und vereinheitlicht ihn
+   auf MD (24px, wie in den Patterns Fakten-Box und CTA-Kasten). Ausgenommen
+   sind alignwide/alignfull-Gruppen: das sind farbige Abschnittsbänder, deren
+   Inhalt bündig zu den Abschnitten darüber und darunter stehen muss. Ein im
+   Editor gesetztes Padding steht inline am Block und gewinnt weiterhin.
+   ---------------------------------------------------------------------- */
+
+.wp-block-group.has-background:not(.alignwide):not(.alignfull) {
+	padding: var(--wp--preset--spacing--md);
+}
+
+/* -------------------------------------------------------------------------
+   Wortmarke im Kopf- und Fußbereich
+
+   Das Logo wird NICHT über `wp:site-logo` ausgeliefert, sondern als Emblem-SVG
+   plus echter Text. Grund: `wp:site-logo` gibt ein <img> aus, und in einem SVG,
+   das über <img> eingebunden ist, lädt kein Webfont – die Wortmarke fiele auf
+   die Systemschrift zurück (siehe technik/architektur-plan.md, Fallstricke).
+   Als HTML-Text nutzt sie dieselbe Schrift wie die Überschriften, bleibt
+   auswählbar, skaliert scharf und folgt jedem künftigen Schriftwechsel.
+
+   Das Emblem erbt über `currentColor` die Textfarbe des Bereichs, in dem es
+   steht – hell auf dem Header, gedämpft im Footer. Nur das Signallicht bleibt
+   fest auf Amber, weil es das Markenzeichen trägt.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.625rem;
+	color: inherit;
+	text-decoration: none;
+}
+
+.koehlbrand-brand__mark {
+	display: block;
+	flex: 0 0 auto;
+}
+
+.koehlbrand-brand__word {
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	font-size: 1.1875rem;
+	letter-spacing: 0.05em;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.koehlbrand-brand:hover .koehlbrand-brand__word,
+.koehlbrand-brand:focus-visible .koehlbrand-brand__word {
+	color: var(--wp--preset--color--accent);
+}
+
+/* Im Footer tritt die Marke einen Schritt zurück. */
+.wp-block-template-part footer .koehlbrand-brand__word,
+footer .koehlbrand-brand__word {
+	font-size: 1rem;
+}
+
+
+/* -------------------------------------------------------------------------
+   Rubrikzeile (zweite Header-Zeile)
+
+   Die Rubriken haben eine eigene Zeile, damit sie sich die Breite nicht mehr
+   mit dem Logo teilen müssen. Gemessen passen acht deutsche Rubriknamen in die
+   1200px-Fläche; darüber hinaus gehört ein „Alle Themen“-Eintrag ans Ende.
+   Auf schmalen Displays wird die Zeile horizontal scrollbar, statt in den
+   Burger zu wandern – so bleiben die Rubriken sichtbar.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-rubriknav {
+	font-size: 0.8125rem;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+.koehlbrand-rubriknav .wp-block-navigation__container {
+	flex-wrap: nowrap;
+	gap: 1.25rem;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scrollbar-width: none;
+	/* Der Scrollbereich darf die Zeile nicht höher machen. */
+	padding-block: 0;
+}
+
+.koehlbrand-rubriknav .wp-block-navigation__container::-webkit-scrollbar {
+	display: none;
+}
+
+.koehlbrand-rubriknav .wp-block-navigation-item {
+	white-space: nowrap;
+}
+
+.koehlbrand-rubriknav .wp-block-navigation-item__content {
+	display: block;
+	padding-block: 0.6875rem;
+	border-bottom: 3px solid transparent;
+	text-decoration: none;
+}
+
+/* Ebenfalls fog statt steel – die Rubrikzeile steht auf Ink, dort wäre das
+   abgedunkelte Stahlblau als Hover-Marke kaum noch zu sehen (2.81). Die aktive
+   Rubrik bleibt Amber und unterscheidet sich damit weiterhin klar vom Hover. */
+.koehlbrand-rubriknav .wp-block-navigation-item__content:hover,
+.koehlbrand-rubriknav .wp-block-navigation-item__content:focus-visible {
+	border-bottom-color: var(--wp--preset--color--fog);
+	text-decoration: none;
+}
+
+.koehlbrand-rubriknav .current-menu-item > .wp-block-navigation-item__content,
+.koehlbrand-rubriknav .current-menu-ancestor > .wp-block-navigation-item__content {
+	border-bottom-color: var(--wp--preset--color--accent);
+}
+
+
+/* -------------------------------------------------------------------------
+   Suchfeld im Header
+
+   Der Suchblock bringt seine eigenen Farben mit, die auf dem dunklen Header
+   nicht funktionieren. Auf schmalen Displays weicht er, damit die Markenzeile
+   nicht gedrängt wird – gesucht wird dort über die Rubriken.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-search {
+	display: none;
+	margin: 0;
+	max-width: 15rem;
+}
+
+@media (min-width: 700px) {
+	.koehlbrand-search {
+		display: block;
+	}
+}
+
+/* Rahmen in fog, nicht in steel: Stahlblau ist seit dem 26.07.2026 auf helle
+   Gründe optimiert und trägt auf dem Dusk-Blau des Headers nur noch 2.08 –
+   der Rahmen ist aber die einzige Kante, an der das Eingabefeld zu erkennen
+   ist. Mit fog sind es 7.67. */
+.koehlbrand-search .wp-block-search__inside-wrapper {
+	border: 1px solid var(--wp--preset--color--fog);
+	background: transparent;
+	padding: 0;
+}
+
+.koehlbrand-search .wp-block-search__input {
+	background: transparent;
+	border: 0;
+	color: #fff;
+	font-size: 0.875rem;
+	padding: 0.4rem 0.6rem;
+}
+
+.koehlbrand-search .wp-block-search__input::placeholder {
+	color: var(--wp--preset--color--fog);
+	opacity: 1;
+}
+
+.koehlbrand-search .wp-block-search__button {
+	background: transparent;
+	border: 0;
+	color: var(--wp--preset--color--fog);
+	padding: 0.4rem 0.6rem;
+}
+
+.koehlbrand-search .wp-block-search__button:hover,
+.koehlbrand-search .wp-block-search__button:focus-visible {
+	color: var(--wp--preset--color--accent);
+}
+
+
+/* -------------------------------------------------------------------------
+   Aufmacher der Startseite
+
+   Bild links, Text rechts – statt der früheren einfarbigen Vollfläche mit
+   zentriertem Text. Der Aufmacher steht auf dem normalen Seitengrund; das
+   Dusk-Blau trägt nur noch die Oberkante und die Überschrift. Grundlage ist
+   die Recherche zu Paket 6: acht von zehn Portalen führen mit einem Bild,
+   und sechs von acht maritimen Auftritten setzen Blau als Textfarbe statt
+   als Grundfläche ein.
+
+   Ohne Beitragsbild rendert `post-featured-image` nichts. Dann bekommt der
+   Text die volle Breite, statt eine leere Spalte stehen zu lassen.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-hero {
+	border-top: 3px solid var(--wp--preset--color--primary);
+}
+
+.koehlbrand-hero__grid {
+	display: grid;
+	gap: var(--wp--preset--spacing--lg);
+	align-items: center;
+}
+
+@media (min-width: 800px) {
+	.koehlbrand-hero__grid {
+		grid-template-columns: 1.15fr 1fr;
+	}
+
+	/* Ohne Bild soll der Text nicht über die volle Breite laufen – eine 1200px
+	   breite Überschriftenzeile ist unlesbar. Stattdessen die normale
+	   Inhaltsbreite. */
+	.koehlbrand-hero__grid:not(:has(img)) {
+		grid-template-columns: minmax(0, 720px);
+		justify-content: start;
+	}
+}
+
+.koehlbrand-hero__media:not(:has(img)) {
+	display: none;
+}
+
+.koehlbrand-hero__media img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Die Rubrik über der Überschrift: klein, gesperrt, in Versalien – das Muster
+   nutzt jedes Portal der Stichprobe. Auf hellem Grund trägt sie Dusk-Blau,
+   nicht Amber: Amber käme auf Off-White nur auf Kontrast 2.1 und wäre damit
+   nicht lesbar. Der eine Amber-Akzent des Aufmachers sitzt im Button. */
+.koehlbrand-kicker {
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+}
+
+.koehlbrand-kicker a {
+	text-decoration: none;
+}
+
+.koehlbrand-kicker a:hover,
+.koehlbrand-kicker a:focus-visible {
+	text-decoration: underline;
+}
+
+
+/* -------------------------------------------------------------------------
+   Fußbereich
+
+   Vier Spalten mit benannten Gruppen statt einer einzigen Liste, die Rubriken
+   und Rechtliches mischte. Festes Raster statt `flexWrap: wrap`, damit bei
+   mittleren Breiten nicht eine einzelne Spalte umbricht: vier Spalten ab
+   1000px, zwei ab 600px, darunter eine.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-footer__cols {
+	display: grid;
+	gap: var(--wp--preset--spacing--lg);
+}
+
+@media (min-width: 600px) {
+	.koehlbrand-footer__cols {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1000px) {
+	.koehlbrand-footer__cols {
+		grid-template-columns: 1.6fr 1fr 1fr 1fr;
+	}
+}
+
+.koehlbrand-footer__brand p {
+	max-width: 32ch;
+}
+
+.koehlbrand-footer__head {
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	letter-spacing: 0.11em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--fog);
+}
+
+.koehlbrand-footer__nav .wp-block-navigation__container {
+	gap: 0.5rem;
+}
+
+.koehlbrand-footer__nav a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.koehlbrand-footer__nav a:hover,
+.koehlbrand-footer__nav a:focus-visible {
+	color: var(--wp--preset--color--accent);
+	text-decoration: underline;
+}
+
+.koehlbrand-footer__base {
+	margin-top: var(--wp--preset--spacing--lg);
+	padding-top: var(--wp--preset--spacing--sm);
+	border-top: 1px solid var(--wp--preset--color--primary);
+}
+
+.koehlbrand-footer__base p {
+	margin: 0;
+}
+
+
+/* -------------------------------------------------------------------------
+   Vollbreites Beitragsbild im Artikel
+
+   Mit dem Split-Aufmacher wird das Beitragsbild für die Content-Pipeline
+   verbindlich – damit tritt ein Fall ein, den es vorher praktisch nie gab:
+   `single.html` zeigt das Bild randlos über die volle Breite, und ohne
+   Deckelung wird ein hochformatiges Motiv über 900px hoch. Der Artikelanfang
+   läge dann unterhalb der Falz, und der Sidebar-Werbeplatz ebenso.
+
+   Deshalb ein Seitenverhältnis: mobil 16:9, ab 900px ein flaches Bannerband.
+   ---------------------------------------------------------------------- */
+
+.wp-block-post-featured-image.alignfull img {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+}
+
+@media (min-width: 900px) {
+	.wp-block-post-featured-image.alignfull img {
+		aspect-ratio: 3 / 1;
+	}
+}
+
+
+/* -------------------------------------------------------------------------
+   Lesezeit (Block koehlbrand/reading-time)
+
+   Steht in der Meta-Zeile hinter Autor und Datum. Der Trennpunkt kommt aus CSS
+   und nicht aus dem Markup, damit er beim Umbruch auf schmalen Displays nicht
+   allein in einer Zeile landet und damit die Angabe ohne ihn auskommt, wenn
+   sie einmal an anderer Stelle steht.
+   ---------------------------------------------------------------------- */
+
+.wp-block-group .koehlbrand-reading-time::before {
+	content: "·";
+	margin-right: 0.5em;
+	color: inherit;
+}
+
+
+/* -------------------------------------------------------------------------
+   Inhaltsverzeichnis (Block koehlbrand/toc)
+
+   Kommt ohne JavaScript aus: <details> klappt auf und zu, das Springen
+   erledigt der Browser. Die Amber-Kante links ist dieselbe Geste wie beim
+   Rubrik-Badge – ein schmaler Signalstreifen statt einer farbigen Fläche.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-toc {
+	margin-block: var(--wp--preset--spacing--lg);
+}
+
+.koehlbrand-toc__box {
+	background: var(--wp--preset--color--bg-alt);
+	border-left: 3px solid var(--wp--preset--color--accent);
+	padding: var(--wp--preset--spacing--md);
+}
+
+.koehlbrand-toc__title {
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	font-size: 0.8125rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--primary);
+	cursor: pointer;
+	/* Eigener Zustandspfeil statt des Standard-Dreiecks: das klebt ohne Abstand
+	   am gesperrt gesetzten Text und lässt sich per CSS nicht rücken. */
+	list-style: none;
+}
+
+.koehlbrand-toc__title::-webkit-details-marker {
+	display: none;
+}
+
+.koehlbrand-toc__title::after {
+	content: "▾";
+	margin-left: 0.5em;
+	color: var(--wp--preset--color--steel);
+}
+
+.koehlbrand-toc__box[open] .koehlbrand-toc__title::after {
+	content: "▴";
+}
+
+.koehlbrand-toc__list {
+	margin: var(--wp--preset--spacing--sm) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.koehlbrand-toc__item + .koehlbrand-toc__item {
+	margin-top: 0.5rem;
+}
+
+.koehlbrand-toc__item--h3 {
+	margin-left: 1.25rem;
+	font-size: var(--wp--preset--font-size--small);
+}
+
+.koehlbrand-toc__item a {
+	color: var(--wp--preset--color--primary);
+	text-decoration: none;
+}
+
+.koehlbrand-toc__item a:hover,
+.koehlbrand-toc__item a:focus-visible {
+	color: var(--wp--preset--color--primary);
+	text-decoration: underline;
+}
+
+/* Sprungziele nicht bündig an die Fensterkante setzen – die angesprungene
+   Überschrift soll sichtbar über ihrem Absatz stehen. */
+.wp-block-post-content :is(h2, h3)[id] {
+	scroll-margin-top: var(--wp--preset--spacing--md);
+}
+
+/* Weiches Scrollen nur, wenn niemand widerspricht. */
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+
+/* -------------------------------------------------------------------------
+   Artikel-Navigation (Block koehlbrand/post-nav)
+
+   Zwei gleich breite Felder am Artikelende. Fehlt ein Nachbar – am Anfang oder
+   Ende einer Rubrik –, bleibt die Spalte leer statt zu rutschen: der nächste
+   Artikel steht dann rechts, wo er hingehört.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-postnav {
+	display: grid;
+	gap: var(--wp--preset--spacing--sm);
+}
+
+@media (min-width: 600px) {
+	.koehlbrand-postnav {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.koehlbrand-postnav__link--next {
+		grid-column: 2;
+		text-align: right;
+	}
+}
+
+.koehlbrand-postnav__link {
+	display: block;
+	padding: var(--wp--preset--spacing--sm) var(--wp--preset--spacing--md);
+	border: 1px solid var(--wp--preset--color--fog);
+	color: inherit;
+	text-decoration: none;
+}
+
+.koehlbrand-postnav__link:hover,
+.koehlbrand-postnav__link:focus-visible {
+	background: var(--wp--preset--color--bg-alt);
+	border-color: var(--wp--preset--color--steel);
+}
+
+.koehlbrand-postnav__label {
+	display: flex;
+	align-items: baseline;
+	gap: 0.4em;
+	margin-bottom: 0.25rem;
+	color: var(--wp--preset--color--steel);
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	font-size: 0.75rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+/* Der Pfeil zeigt aus dem Feld heraus: beim vorherigen Artikel nach links vor
+   den Text, beim nächsten nach rechts dahinter. Im Markup steht er beide Male
+   vorn, damit Vorlesewerkzeuge die Richtung zuerst hören. */
+.koehlbrand-postnav__link--next .koehlbrand-postnav__arrow {
+	order: 1;
+}
+
+@media (min-width: 600px) {
+	.koehlbrand-postnav__link--next .koehlbrand-postnav__label {
+		justify-content: flex-end;
+	}
+}
+
+.koehlbrand-postnav__title {
+	display: block;
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	font-size: 1.125rem;
+	line-height: 1.25;
+	color: var(--wp--preset--color--primary);
+}
+
+.koehlbrand-postnav__link:hover .koehlbrand-postnav__title,
+.koehlbrand-postnav__link:focus-visible .koehlbrand-postnav__title {
+	text-decoration: underline;
+}
+
+
+/* Fokus-Stile für Tastaturnavigation, konsistent mit Amber-Akzentfarbe */
+:where(a, button, input, textarea, select, summary):focus-visible {
+	outline: 2px solid var(--wp--preset--color--accent);
+	outline-offset: 2px;
+}
+
+/* Sichtbarer "Skip to content"-Link */
+.skip-link {
+	background: var(--wp--preset--color--primary);
+	color: #fff;
+	padding: var(--wp--preset--spacing--xs) var(--wp--preset--spacing--sm);
+	position: absolute;
+	left: 0;
+	top: -100px;
+	z-index: 100000;
+	transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+	top: 0;
+}
+
+/* Brotkrumen-Navigation (Block koehlbrand/breadcrumbs) */
+.koehlbrand-breadcrumbs {
+	color: var(--wp--preset--color--steel);
+	font-size: var(--wp--preset--font-size--small);
+}
+
+.koehlbrand-breadcrumbs a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.koehlbrand-breadcrumbs a:hover,
+.koehlbrand-breadcrumbs a:focus-visible {
+	color: var(--wp--preset--color--primary);
+	text-decoration: underline;
+}
+
+.koehlbrand-breadcrumbs__sep {
+	margin: 0 0.5em;
+	color: var(--wp--preset--color--fog);
+}
+
+/* Der aktuelle Eintrag wird bei langen Titeln gekürzt, damit der Pfad
+   auf dem Handy nicht über mehrere Zeilen läuft. */
+.koehlbrand-breadcrumbs__current {
+	display: inline-block;
+	max-width: 22ch;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: bottom;
+	white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------
+   Zweispaltiges Layout (Artikel/Archiv + Sidebar)
+
+   Erst ab 1100px zweispaltig: 720px Inhalt + 300px Sidebar + 2.5rem Abstand
+   ergeben 1060px, dazu 2×1rem Seitenabstand des Bodys. Darunter stapeln beide
+   Spalten im normalen Blockfluss – die Sidebar enthält aktuell nur den
+   Werbeplatz, und der blendet sich mobil selbst aus.
+   ---------------------------------------------------------------------- */
+
+@media (min-width: 1100px) {
+	.koehlbrand-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 720px) 300px;
+		gap: var(--wp--preset--spacing--lg);
+		/* Hält das Spaltenpaar in der 1200px breiten Fläche mittig, damit der
+		   Artikel dort steht, wo er vorher einspaltig stand. */
+		justify-content: center;
+		align-items: stretch;
+	}
+
+	/* Die Abstandsregeln des Flow-Layouts würden sonst zusätzlich zum
+	   Grid-Gap wirken und die Sidebar nach unten schieben. */
+	.koehlbrand-layout > * {
+		margin-block: 0;
+	}
+}
+
+/* Damit position:sticky in der Sidebar Weg zum Mitlaufen hat, muss die Spalte
+   die volle Zeilenhöhe einnehmen. */
+.koehlbrand-layout__aside {
+	height: 100%;
+}
+
+
+/* -------------------------------------------------------------------------
+   Werbeplätze
+
+   Die reservierten Mindesthöhen kommen NICHT von hier, sondern werden aus
+   koehlbrand_ad_slots() erzeugt (inc/ads.php) und als Inline-Style an dieses
+   Stylesheet gehängt. So stehen Markup und Platzreservierung an einer Stelle.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-ad {
+	margin-block: var(--wp--preset--spacing--lg);
+}
+
+/* Trennungsgebot: die Kennzeichnung steht fest im Markup und ist nicht
+   abschaltbar. */
+.koehlbrand-ad__label {
+	display: block;
+	margin-bottom: 0.25rem;
+	color: var(--wp--preset--color--steel);
+	font-size: 0.6875rem;
+	letter-spacing: 0.08em;
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+.koehlbrand-ad__inner {
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	overflow: hidden;
+}
+
+/* Vorschaumodus (Option koehlbrand_ads_preview): zeigt die reservierte Fläche,
+   damit sich das Layout ohne AdSense-Konto abnehmen lässt. */
+.koehlbrand-ad__placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: var(--wp--preset--spacing--xs);
+	border: 1px dashed var(--wp--preset--color--fog);
+	background: var(--wp--preset--color--bg-alt);
+	color: var(--wp--preset--color--steel);
+	font-family: var(--wp--preset--font-family--headline);
+	font-size: var(--wp--preset--font-size--small);
+	text-align: center;
+}
+
+/* Sidebar: 300×600 erst dort, wo die zweite Spalte überhaupt existiert. */
+.koehlbrand-ad--sidebar {
+	display: none;
+	margin-block: 0;
+}
+
+@media (min-width: 1100px) {
+	.koehlbrand-ad--sidebar {
+		display: block;
+	}
+}
+
+.koehlbrand-ad--sticky {
+	position: sticky;
+	top: var(--wp--preset--spacing--sm);
+}
+
+/* In-Feed-Karte soll sich im Raster wie ein Teaser verhalten. */
+.koehlbrand-ad--in-feed {
+	margin-block: 0;
+}
+
+/* Anchor: nur mobil, fixiert am unteren Rand. position:fixed erzeugt keinen
+   Layout-Shift; der Platz darunter wird über .wp-site-blocks freigehalten,
+   sonst verdeckt die Leiste den Seitenfuß. */
+.koehlbrand-ad--anchor {
+	position: fixed;
+	inset: auto 0 0 0;
+	z-index: 90;
+	margin: 0;
+	padding: 0.25rem var(--wp--preset--spacing--sm);
+	padding-bottom: calc(0.25rem + env(safe-area-inset-bottom, 0px));
+	background: var(--wp--preset--color--sand);
+	border-top: 1px solid var(--wp--preset--color--fog);
+	box-shadow: 0 -2px 8px rgba(18, 36, 47, 0.08);
+}
+
+body.koehlbrand-has-anchor-ad .wp-site-blocks {
+	padding-bottom: 96px;
+}
+
+@media (min-width: 782px) {
+	.koehlbrand-ad--anchor {
+		display: none;
+	}
+
+	body.koehlbrand-has-anchor-ad .wp-site-blocks {
+		padding-bottom: 0;
+	}
+}
+
+/* Amber-Signallicht-Akzent nur sparsam einsetzen – hier für Meta/Rubrik-Badges */
+.koehlbrand-rubrik-badge {
+	display: inline-block;
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	font-size: var(--wp--preset--font-size--small);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--wp--preset--color--primary);
+	background: var(--wp--preset--color--bg-alt);
+	border-left: 3px solid var(--wp--preset--color--accent);
+	padding: 0.2rem 0.6rem;
+}

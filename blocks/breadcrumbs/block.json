@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "koehlbrand/breadcrumbs",
+	"title": "Brotkrumen-Navigation",
+	"category": "theme",
+	"icon": "menu-alt",
+	"description": "Pfad der aktuellen Seite (Start → Rubrik → Artikel). Liefert zusätzlich das BreadcrumbList-Schema für die Suchergebnisse.",
+	"textdomain": "koehlbrand",
+	"keywords": [ "breadcrumb", "brotkrumen", "navigation", "pfad" ],
+	"supports": {
+		"html": false,
+		"align": false,
+		"spacing": { "margin": true, "padding": true },
+		"typography": { "fontSize": true }
+	},
+	"editorScript": "koehlbrand-breadcrumbs-editor"
+}

@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "koehlbrand/reading-time",
+	"title": "Lesezeit",
+	"category": "theme",
+	"icon": "clock",
+	"description": "Geschätzte Lesezeit des Beitrags, berechnet aus der Wortzahl. Gehört in die Meta-Zeile neben Autor und Datum.",
+	"textdomain": "koehlbrand",
+	"keywords": [ "lesezeit", "lesedauer", "minuten", "meta" ],
+	"usesContext": [ "postId" ],
+	"supports": {
+		"html": false,
+		"align": false,
+		"color": { "text": true, "background": false },
+		"spacing": { "margin": true },
+		"typography": { "fontSize": true }
+	},
+	"editorScript": "koehlbrand-reading-time-editor"
+}

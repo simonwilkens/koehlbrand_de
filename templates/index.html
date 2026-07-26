@@ -1,0 +1,64 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"align":"full","layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignfull">
+	<!-- wp:koehlbrand/ad-slot {"slot":"header","align":"wide"} /-->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:group {"tagName":"main","align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|lg","bottom":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
+<main class="wp-block-group alignwide" style="padding-top:var(--wp--preset--spacing--lg);padding-bottom:var(--wp--preset--spacing--xl)">
+
+	<!-- wp:query {"queryId":0,"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":true}} -->
+	<div class="wp-block-query">
+
+		<!-- wp:post-template {"style":{"spacing":{"blockGap":"var:preset|spacing|lg"}}} -->
+
+			<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|xs"}},"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group">
+
+				<!-- wp:post-featured-image {"isLink":true,"style":{"border":{"radius":"2px"}}} /-->
+
+				<!-- wp:post-terms {"term":"category","fontSize":"small"} /-->
+
+				<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
+
+				<!-- wp:group {"layout":{"type":"flex"}} -->
+				<div class="wp-block-group">
+					<!-- wp:post-date {"fontSize":"small","textColor":"steel"} /-->
+					<!-- wp:post-author {"showAvatar":false,"fontSize":"small","textColor":"steel"} /-->
+				</div>
+				<!-- /wp:group -->
+
+				<!-- wp:post-excerpt {"moreText":"Weiterlesen →"} /-->
+
+				<!-- wp:separator {"textColor":"fog"} -->
+				<hr class="wp-block-separator has-text-color has-fog-color has-alpha-channel-opacity"/>
+				<!-- /wp:separator -->
+
+			</div>
+			<!-- /wp:group -->
+
+			<!-- wp:koehlbrand/ad-slot {"slot":"in-feed","interval":3} /-->
+
+		<!-- /wp:post-template -->
+
+		<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
+			<!-- wp:query-pagination-previous {"label":"← Neuere Beiträge"} /-->
+			<!-- wp:query-pagination-numbers /-->
+			<!-- wp:query-pagination-next {"label":"Ältere Beiträge →"} /-->
+		<!-- /wp:query-pagination -->
+
+		<!-- wp:query-no-results -->
+			<!-- wp:paragraph -->
+			<p>Aktuell liegen keine Beiträge vor.</p>
+			<!-- /wp:paragraph -->
+		<!-- /wp:query-no-results -->
+
+	</div>
+	<!-- /wp:query -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

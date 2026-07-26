@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "koehlbrand/toc",
+	"title": "Inhaltsverzeichnis",
+	"category": "theme",
+	"icon": "list-view",
+	"description": "Sprungmarken zu den Zwischenüberschriften des Artikels. Rendert nur, wenn der Beitrag genug Überschriften hat.",
+	"textdomain": "koehlbrand",
+	"keywords": [ "inhaltsverzeichnis", "toc", "sprungmarken", "gliederung" ],
+	"usesContext": [ "postId" ],
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": false,
+		"spacing": { "margin": true },
+		"typography": { "fontSize": true }
+	},
+	"editorScript": "koehlbrand-toc-editor"
+}

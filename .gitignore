@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editoren
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*~
+
+# Pakete / Build-Artefakte
+*.zip
+node_modules/
+vendor/
+*.log
+
+# Lokale Konfiguration
+.env
+.env.*

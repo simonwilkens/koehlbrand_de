@@ -1,0 +1,180 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group">
+
+	<!-- wp:query {"queryId":1,"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":false},"align":"wide","className":"koehlbrand-hero","style":{"spacing":{"padding":{"top":"var:preset|spacing|lg","bottom":"var:preset|spacing|lg"}}}} -->
+	<div class="wp-block-query alignwide koehlbrand-hero" style="padding-top:var(--wp--preset--spacing--lg);padding-bottom:var(--wp--preset--spacing--lg)">
+		<!-- wp:post-template {"layout":{"type":"default"}} -->
+
+			<!-- wp:group {"className":"koehlbrand-hero__grid","layout":{"type":"default"}} -->
+			<div class="wp-block-group koehlbrand-hero__grid">
+
+				<!-- wp:group {"className":"koehlbrand-hero__media","layout":{"type":"default"}} -->
+				<div class="wp-block-group koehlbrand-hero__media">
+					<!-- wp:post-featured-image {"isLink":true,"aspectRatio":"16/10"} /-->
+				</div>
+				<!-- /wp:group -->
+
+				<!-- wp:group {"className":"koehlbrand-hero__text","style":{"spacing":{"blockGap":"var:preset|spacing|sm"}},"layout":{"type":"constrained"}} -->
+				<div class="wp-block-group koehlbrand-hero__text">
+
+					<!-- wp:post-terms {"term":"category","fontSize":"small","textColor":"primary","className":"koehlbrand-kicker"} /-->
+
+					<!-- wp:post-title {"isLink":true,"level":1,"textColor":"ink","fontSize":"xx-large"} /-->
+
+					<!-- wp:post-excerpt {"excerptLength":30} /-->
+
+					<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|sm"}},"layout":{"type":"flex"}} -->
+					<div class="wp-block-group">
+						<!-- wp:post-author {"showAvatar":false,"textColor":"steel","fontSize":"small"} /-->
+						<!-- wp:post-date {"textColor":"steel","fontSize":"small"} /-->
+						<!-- wp:koehlbrand/reading-time {"textColor":"steel","fontSize":"small"} /-->
+					</div>
+					<!-- /wp:group -->
+
+					<!-- wp:buttons -->
+					<div class="wp-block-buttons">
+						<!-- wp:button {"backgroundColor":"accent","textColor":"ink"} -->
+						<div class="wp-block-button"><a class="wp-block-button__link has-ink-color has-accent-background-color has-text-color has-background wp-element-button">Artikel lesen</a></div>
+						<!-- /wp:button -->
+					</div>
+					<!-- /wp:buttons -->
+
+				</div>
+				<!-- /wp:group -->
+
+			</div>
+			<!-- /wp:group -->
+
+		<!-- /wp:post-template -->
+	</div>
+	<!-- /wp:query -->
+
+	<!-- wp:koehlbrand/ad-slot {"slot":"header","align":"wide"} /-->
+
+	<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
+	<div class="wp-block-group alignwide" style="padding-top:var(--wp--preset--spacing--xl)">
+
+		<!-- wp:heading {"fontFamily":"headline"} -->
+		<h2 class="wp-block-heading has-headline-font-family">Aktuell</h2>
+		<!-- /wp:heading -->
+
+		<!-- wp:query {"queryId":2,"query":{"perPage":6,"pages":0,"offset":1,"postType":"post","order":"desc","orderBy":"date","inherit":false}} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"layout":{"type":"grid","columnCount":3}} -->
+				<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|xs"}},"backgroundColor":"bg-alt","layout":{"type":"constrained"}} -->
+				<div class="wp-block-group has-bg-alt-background-color has-background">
+					<!-- wp:post-featured-image {"isLink":true} /-->
+					<!-- wp:post-terms {"term":"category","fontSize":"small"} /-->
+					<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
+					<!-- wp:post-date {"fontSize":"small","textColor":"steel"} /-->
+				</div>
+				<!-- /wp:group -->
+			<!-- /wp:post-template -->
+		</div>
+		<!-- /wp:query -->
+
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
+	<div class="wp-block-group alignwide" style="padding-top:var(--wp--preset--spacing--xl)">
+
+		<!-- wp:group {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+		<div class="wp-block-group">
+			<!-- wp:heading {"fontFamily":"headline"} -->
+			<h2 class="wp-block-heading has-headline-font-family">Neubau der Brücke</h2>
+			<!-- /wp:heading -->
+			<!-- wp:paragraph {"fontSize":"small"} -->
+			<p class="has-small-font-size"><a href="/kategorie/neubau/">Alle Beiträge →</a></p>
+			<!-- /wp:paragraph -->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:query {"queryId":3,"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":false}} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"layout":{"type":"grid","columnCount":3},"className":"koehlbrand-cat-neubau"} -->
+				<!-- wp:post-featured-image {"isLink":true} /-->
+				<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
+				<!-- wp:post-excerpt {"excerptLength":18} /-->
+			<!-- /wp:post-template -->
+			<!-- wp:query-no-results -->
+				<!-- wp:paragraph {"textColor":"steel"} -->
+				<p class="has-steel-color has-text-color">Noch keine Beiträge in der Kategorie „neubau“.</p>
+				<!-- /wp:paragraph -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"align":"wide","backgroundColor":"bg-alt","style":{"spacing":{"padding":{"top":"var:preset|spacing|xl","bottom":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
+	<div class="wp-block-group alignwide has-bg-alt-background-color has-background" style="padding-top:var(--wp--preset--spacing--xl);padding-bottom:var(--wp--preset--spacing--xl)">
+
+		<!-- wp:group {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+		<div class="wp-block-group">
+			<!-- wp:heading {"fontFamily":"headline"} -->
+			<h2 class="wp-block-heading has-headline-font-family">Hafenwirtschaft</h2>
+			<!-- /wp:heading -->
+			<!-- wp:paragraph {"fontSize":"small"} -->
+			<p class="has-small-font-size"><a href="/kategorie/hafenwirtschaft/">Alle Beiträge →</a></p>
+			<!-- /wp:paragraph -->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:query {"queryId":4,"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":false}} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"layout":{"type":"grid","columnCount":3},"className":"koehlbrand-cat-hafenwirtschaft"} -->
+				<!-- wp:post-featured-image {"isLink":true} /-->
+				<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
+				<!-- wp:post-excerpt {"excerptLength":18} /-->
+			<!-- /wp:post-template -->
+			<!-- wp:query-no-results -->
+				<!-- wp:paragraph {"textColor":"steel"} -->
+				<p class="has-steel-color has-text-color">Noch keine Beiträge in der Kategorie „hafenwirtschaft“.</p>
+				<!-- /wp:paragraph -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|xl","bottom":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
+	<div class="wp-block-group alignwide" style="padding-top:var(--wp--preset--spacing--xl);padding-bottom:var(--wp--preset--spacing--xl)">
+
+		<!-- wp:group {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+		<div class="wp-block-group">
+			<!-- wp:heading {"fontFamily":"headline"} -->
+			<h2 class="wp-block-heading has-headline-font-family">Ausflugs- &amp; Fototipps</h2>
+			<!-- /wp:heading -->
+			<!-- wp:paragraph {"fontSize":"small"} -->
+			<p class="has-small-font-size"><a href="/kategorie/ausflugstipps/">Alle Beiträge →</a></p>
+			<!-- /wp:paragraph -->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:query {"queryId":5,"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":false}} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"layout":{"type":"grid","columnCount":3},"className":"koehlbrand-cat-ausflugstipps koehlbrand-cat-fototipps"} -->
+				<!-- wp:post-featured-image {"isLink":true} /-->
+				<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
+				<!-- wp:post-excerpt {"excerptLength":18} /-->
+			<!-- /wp:post-template -->
+			<!-- wp:query-no-results -->
+				<!-- wp:paragraph {"textColor":"steel"} -->
+				<p class="has-steel-color has-text-color">Noch keine Beiträge in den Rubriken „Ausflugstipps“ und „Fototipps“.</p>
+				<!-- /wp:paragraph -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+
+	</div>
+	<!-- /wp:group -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
