@@ -17,9 +17,16 @@
  *                   haben (Zustand der lokalen Testinstanz).
  * 3. **aktiv**    – Publisher-ID gesetzt: echtes `<ins class="adsbygoogle">`.
  *
- * Konfiguration ausschließlich über Optionen/Filter, nicht über Konstanten –
- * die Live-Werte kommen später aus dem wp-admin bzw. per WP-CLI, ohne dass das
- * Theme angefasst werden muss.
+ * Konfiguration über Optionen/Filter, nicht über Konstanten – die Live-Werte
+ * kommen später aus dem wp-admin bzw. per WP-CLI, ohne dass das Theme angefasst
+ * werden muss. Einzige Ausnahme ist die Publisher-ID für die Site-Verifizierung,
+ * siehe `koehlbrand_adsense_publisher_id()`.
+ *
+ * **Verifizierung und Auslieferung sind zwei Paar Schuhe.** Der Meta-Tag
+ * `google-adsense-account` weist die Website dem AdSense-Konto zu und muss auf
+ * jeder Seite stehen, bevor Google überhaupt freischaltet. Er zieht für sich
+ * genommen kein Skript nach und liefert keine Anzeige aus. Die Auslieferung
+ * hängt allein an `koehlbrand_adsense_client()`.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,6 +38,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Media-Queries in style.css passen.
  */
 define( 'KOEHLBRAND_AD_BP_DESKTOP', 782 );
+
+/**
+ * AdSense-Publisher-ID der Website. Standardwert für die Site-Verifizierung,
+ * per Option `koehlbrand_adsense_publisher_id` oder gleichnamigem Filter
+ * überschreibbar.
+ */
+define( 'KOEHLBRAND_ADSENSE_PUBLISHER_ID', 'ca-pub-9359612609141957' );
 
 
 /* -------------------------------------------------------------------------
@@ -45,6 +59,45 @@ function koehlbrand_adsense_client() {
 
 	return trim( $client );
 }
+
+/**
+ * Publisher-ID für die Site-Verifizierung ("ca-pub-…").
+ *
+ * Bewusst mit hinterlegtem Standardwert, anders als die übrige
+ * Ad-Konfiguration: Der Verifizierungs-Tag muss auf jeder Seite stehen, damit
+ * Google die Website freischaltet. Hinge er an einem Options-Eintrag, den
+ * jemand beim Aufsetzen vergisst, scheiterte die Freischaltung stillschweigend
+ * – und der Fehler wäre bei Google zu suchen, nicht im Theme. Ein Geheimnis ist
+ * die ID nicht: Sie steht im Quelltext jeder ausgelieferten Seite.
+ *
+ * Option und Filter haben trotzdem Vorrang, damit die Testinstanz sich nicht
+ * als Live-Site ausgibt (leerer String schaltet den Tag ab).
+ */
+function koehlbrand_adsense_publisher_id() {
+	$id = trim( (string) get_option( 'koehlbrand_adsense_publisher_id', KOEHLBRAND_ADSENSE_PUBLISHER_ID ) );
+	$id = trim( (string) apply_filters( 'koehlbrand_adsense_publisher_id', $id ) );
+
+	return preg_match( '/^ca-pub-[0-9]{10,20}$/', $id ) ? $id : '';
+}
+
+/**
+ * Site-Verifizierung: `<meta name="google-adsense-account">` in den Head.
+ *
+ * Läuft auf Priorität 2, also direkt nach dem CMP-Slot (Priorität 1) und vor
+ * allem anderen. Der Tag ist unabhängig davon, ob Anzeigen laufen – er steht
+ * auch dann, wenn `koehlbrand_adsense_client()` leer ist, denn die
+ * Kontofreischaltung geht der ersten Anzeige voraus.
+ */
+function koehlbrand_adsense_site_verification() {
+	$id = koehlbrand_adsense_publisher_id();
+
+	if ( '' === $id ) {
+		return;
+	}
+
+	printf( '<meta name="google-adsense-account" content="%s">' . "\n", esc_attr( $id ) );
+}
+add_action( 'wp_head', 'koehlbrand_adsense_site_verification', 2 );
 
 /**
  * Zuordnung Slot-Name => AdSense-Anzeigenblock-ID (die numerische

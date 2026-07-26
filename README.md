@@ -125,6 +125,45 @@ Einwilligung) geklärt sein.
 
 ## Werbeplätze (`inc/ads.php`)
 
+### Site-Verifizierung (unabhängig von der Auslieferung)
+
+Das Theme setzt auf jeder Seite den Meta-Tag, mit dem Google die Website dem
+AdSense-Konto zuordnet:
+
+```html
+<meta name="google-adsense-account" content="ca-pub-9359612609141957">
+```
+
+Die ID steht als Standardwert in `KOEHLBRAND_ADSENSE_PUBLISHER_ID` – anders als
+die übrige Ad-Konfiguration, die über Optionen läuft. Grund: Der Tag muss stehen,
+damit Google überhaupt freischaltet; hinge er an einem Options-Eintrag, den
+jemand beim Aufsetzen vergisst, scheiterte die Freischaltung stillschweigend.
+Ein Geheimnis ist die ID nicht, sie steht im Quelltext jeder Seite. Überschreiben
+geht per Option `koehlbrand_adsense_publisher_id` oder gleichnamigem Filter; ein
+leerer Wert schaltet den Tag ab (z. B. auf einer Staging-Instanz, die sich nicht
+als Live-Site ausgeben soll).
+
+**Der Tag liefert keine Anzeigen aus.** Er zieht kein Skript nach. Ob Anzeigen
+laufen, hängt allein an `koehlbrand_adsense_client` – siehe unten.
+
+### Reihenfolge bis zur ersten echten Anzeige
+
+1. Meta-Tag ausliefern ✔ (erledigt)
+2. Google schaltet die Website frei
+3. Sechs Anzeigenblöcke im AdSense-Konto anlegen, IDs in
+   `koehlbrand_adsense_slot_ids` eintragen. Ohne diese IDs rendert ein Slot nur
+   die Höhenreservierung – ein `<ins>` ohne `data-ad-slot` erzeugt lediglich
+   einen Konsolenfehler.
+4. Zertifizierte CMP (TCF 2.2) am Hook `koehlbrand_cmp` einhängen. Ohne sie
+   liefert Google für EWR-Traffic keine oder nur nicht-personalisierte Anzeigen –
+   das ist eine Auslieferungssperre bei Google, keine DSGVO-Abwägung.
+5. `koehlbrand_adsense_client` setzen und `koehlbrand_ads_preview` auf 0.
+
+Schritt 5 vor Schritt 3 und 4 bringt nichts: Der Loader lädt auf jeder Seite,
+Anzeigen erscheinen keine.
+
+### Auslieferung
+
 Alle Plätze reservieren ihre Höhe, bevor irgendein Skript lädt – sonst springt
 das Layout beim Nachladen (schlechter CLS-Wert, weniger sichtbare Anzeigen).
 Die Kennzeichnung „Anzeige“ steckt fest im Markup und ist nicht abschaltbar.
