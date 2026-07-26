@@ -5,10 +5,53 @@ in `branding/koehlbrand-brand-guidelines.md` und `branding/design-tokens.css`.
 
 ## Installation
 
-1. Ordner `koehlbrand-theme` als ZIP packen (bereits als `koehlbrand-theme.zip`
-   im Projektordner vorhanden) und unter **Design → Themes → Neu hinzufügen →
-   Theme hochladen** installieren, oder per FTP nach `wp-content/themes/` kopieren.
+1. Ordner `koehlbrand-theme` als ZIP packen und unter **Design → Themes → Neu
+   hinzufügen → Theme hochladen** installieren, oder per FTP nach
+   `wp-content/themes/` kopieren.
 2. Theme aktivieren.
+
+Das gilt für die **Erstinstallation**. Alle weiteren Updates kommen über Git
+Updater aus dem GitHub-Repo (siehe unten) – danach ist kein ZIP-Upload mehr
+nötig. Ein eventuell noch im Projektordner liegendes `koehlbrand-theme-v1.zip`
+ist ein alter Stand und nicht mehr aktuell.
+
+## Updates über Git Updater
+
+Der Theme-Code liegt in **`simonwilkens/koehlbrand_de`** (privates Repo, Theme
+im Repo-Root). Das Plugin [Git Updater](https://git-updater.com/) zieht neue
+Versionen direkt von dort und meldet sie als normales Theme-Update im wp-admin.
+
+Verdrahtet ist das über zwei Zeilen im Header dieser `style.css`:
+
+```
+Update URI: https://github.com/simonwilkens/koehlbrand_de
+GitHub Theme URI: simonwilkens/koehlbrand_de
+```
+
+Einrichtung auf dem Server:
+
+1. Git Updater installieren und aktivieren.
+2. Unter **Einstellungen → Git Updater → GitHub** einen GitHub-Token
+   hinterlegen. Weil das Repo privat ist, geht es ohne nicht. Fine-grained
+   Token, nur dieses eine Repository, Berechtigung **Contents: Read** und
+   **Metadata: Read** – kein Schreibrecht. Der Token liegt dauerhaft in einer
+   WordPress-Option; ein Token mit Push-Rechten hätte dort nichts zu suchen.
+3. Unter **Einstellungen → Git Updater → Übersicht** prüfen, ob das Theme
+   erkannt wird.
+
+Ein Update besteht aus zwei Schritten, die zusammengehören: **Version im
+`style.css`-Header hochzählen** und einen **Git-Tag mit derselben Nummer**
+setzen (`v1.2.0` → Version `1.2.0`). Git Updater vergleicht die Version aus dem
+neuesten Tag mit der installierten – ohne Tag passiert nichts, und ein Tag, der
+nicht zur Header-Version passt, führt zu Updates, die sich nicht wegklicken
+lassen.
+
+> **Beim ersten Update prüfen:** Das Theme liegt auf dem Server im Verzeichnis
+> `koehlbrand-theme`, das Repo heißt `koehlbrand_de`. Git Updater benennt den
+> entpackten Ordner normalerweise auf den installierten Theme-Slug um. Falls
+> nach dem ersten Update stattdessen ein zweites Theme-Verzeichnis auftaucht,
+> muss das Theme einmalig unter dem Verzeichnisnamen `koehlbrand_de` neu
+> installiert werden.
 
 ## Läuft automatisch bei der Aktivierung
 
