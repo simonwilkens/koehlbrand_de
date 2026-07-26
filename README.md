@@ -3,71 +3,70 @@
 Block-Theme (Full Site Editing) für koehlbrand.de, gebaut nach den Marken-Guidelines
 in `branding/koehlbrand-brand-guidelines.md` und `branding/design-tokens.css`.
 
-## Installation
+## Installation und Updates (WordPress-Multisite)
 
-1. Ordner `koehlbrand-theme` als ZIP packen und unter **Design → Themes → Neu
-   hinzufügen → Theme hochladen** installieren, oder per FTP nach
-   `wp-content/themes/` kopieren.
-2. Theme aktivieren.
+koehlbrand.de ist eine Site in einem Multisite-Netzwerk mit rund neun
+Auftritten. Themes liegen dort netzwerkweit in `wp-content/themes/`; eine
+einzelne Site kann ein Theme aktivieren, aber weder installieren noch
+aktualisieren. Beides macht ausschließlich der Netzwerk-Admin.
 
-Das gilt für die **Erstinstallation**. Alle weiteren Updates kommen über Git
-Updater aus dem GitHub-Repo (siehe unten) – danach ist kein ZIP-Upload mehr
-nötig. Ein eventuell noch im Projektordner liegendes `koehlbrand-theme-v1.zip`
-ist ein alter Stand und nicht mehr aktuell.
+**Installieren (als Super Admin):**
 
-## Updates über Git Updater
+1. **Netzwerkverwaltung → Themes → Theme hinzufügen → Theme hochladen**,
+   ZIP auswählen, installieren. Das ZIP muss den Ordner `koehlbrand-theme`
+   als Wurzel enthalten.
+2. Das Theme für koehlbrand.de freigeben – entweder netzwerkweit aktivieren
+   oder in den Einstellungen dieser einen Site.
+3. Im Backend von koehlbrand.de unter **Design → Themes** aktivieren.
 
-Der Theme-Code liegt in **`simonwilkens/koehlbrand_de`** (öffentliches Repo,
-Theme im Repo-Root). Das Plugin [Git Updater](https://github.com/afragen/git-updater)
-zieht neue Versionen direkt von dort und meldet sie als normales Theme-Update
-im wp-admin.
+**Aktualisieren:** derselbe Weg. Neues ZIP über die Netzwerkverwaltung
+hochladen, WordPress fragt beim Überschreiben nach und zeigt beide Versionen
+an. Vorher lokal im Docker prüfen (siehe `technik/architektur-plan.md`) – ein
+Theme-Update trifft in einer Multisite jede Site, die das Theme nutzt.
 
-Verdrahtet ist das über zwei Zeilen im Header dieser `style.css`:
+### Warum kein automatischer Update-Mechanismus
 
-```
-Update URI: https://github.com/simonwilkens/koehlbrand_de
-GitHub Theme URI: simonwilkens/koehlbrand_de
-```
+Bewusste Entscheidung vom 27.07.2026. Der Code liegt in
+**`simonwilkens/koehlbrand_de`** (öffentlich, Theme im Repo-Root), und das
+Repo ist so aufgebaut, dass Git Updater damit arbeiten könnte. Eingerichtet
+ist es trotzdem nicht:
 
-Einrichtung auf dem Server:
+- Git Updater ist ein **Network-Only-Plugin** (`Network: true` im Header) und
+  lässt sich nur netzwerkweit aktivieren. Es hängt sich dann in
+  `site_transient_update_themes`, `site_transient_update_plugins` und
+  `upgrader_source_selection` ein – also in die Hooks, über die jedes Update
+  aller neun Sites läuft. Auf welche Themes es zugreift, steuert allein der
+  Header `GitHub Theme URI` / `Update URI`; eine Beschränkung auf ein
+  bestimmtes Theme gibt es nicht.
+- Der Server läuft auf **PHP 7.4**. Git Updater verlangt seit 12.10.0
+  (29.01.2025) PHP 8.0; nutzbar wäre nur die eingefrorene **12.9.0** vom
+  08.01.2025 – ohne Sicherheitsupdates, mit Schreibrechten aufs Dateisystem.
 
-1. Git Updater installieren und aktivieren. Es liegt nicht auf wordpress.org,
-   das ZIP kommt aus den
-   [GitHub-Releases](https://github.com/afragen/git-updater/releases/latest)
-   und wird unter **Plugins → Installieren → Plugin hochladen** eingespielt.
-2. Unter **Einstellungen → Git Updater → Übersicht** prüfen, ob das Theme
-   erkannt wird. Ein Token ist nicht nötig.
+Das Risiko für acht fremde Websites wiegt schwerer als der gesparte
+ZIP-Upload. Aus demselben Grund trägt der `style.css`-Header **keinen**
+`Update URI` und **kein** `GitHub Theme URI`: Git Updater ist im Netzwerk
+installiert, nur nicht aktiviert – mit den Headern würde es dieses Theme
+automatisch erfassen, sobald es jemand für ein anderes Projekt aktiviert.
 
-> **Warum das Repo öffentlich ist:** Git Updater ist für öffentliche Repos
-> dauerhaft kostenlos. Für **private** Repos braucht es authentifizierte
-> API-Anfragen, und die stellt es nach einer Testphase nur noch mit gekaufter
-> Lizenz. Da das Theme ohnehin unter GPL-2.0-or-later steht, die Schriften
-> unter der OFL weitergegeben werden dürfen und das Repo keine Zugangsdaten
-> enthält, ist ein öffentliches Repo hier der einfachere Weg. Wenn es je privat
-> werden muss, ist [Plugin Update
-> Checker](https://github.com/YahnisElsts/plugin-update-checker) (MIT) die
-> kostenlose Alternative – als Library ins Theme eingebunden statt als Plugin.
+**Wenn das später doch automatisch laufen soll**, ist
+[Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker)
+(MIT, PHP ≥ 5.6.20, läuft also auf 7.4) der passendere Weg: als mu-plugin
+eingebunden und namentlich auf `koehlbrand-theme` konfiguriert, wirkt er
+ausschließlich auf dieses eine Theme.
+
+### Versionen und Tags
+
+Auch ohne Update-Mechanismus gilt: **Version im `style.css`-Header hochzählen
+und einen Git-Tag mit derselben Nummer setzen** (`v1.2.1` → Version `1.2.1`).
+Nur so lässt sich später nachvollziehen, welcher Stand auf dem Server liegt –
+und ein automatischer Mechanismus ließe sich jederzeit ohne Aufräumarbeit
+nachrüsten.
 
 > **Keine Zugangsdaten ins Repo.** `branding/`, `technik/` und
-> `docker-compose.yml` aus dem Projektordner gehören bewusst **nicht** hierher:
-> Git Updater entpackt den kompletten Repo-Inhalt bei jedem Update nach
-> `wp-content/themes/`. Alles, was hier liegt, ist damit auf dem Live-Server
-> über HTTP erreichbar – und seit das Repo öffentlich ist, ohnehin für jeden
-> einsehbar.
-
-Ein Update besteht aus zwei Schritten, die zusammengehören: **Version im
-`style.css`-Header hochzählen** und einen **Git-Tag mit derselben Nummer**
-setzen (`v1.2.0` → Version `1.2.0`). Git Updater vergleicht die Version aus dem
-neuesten Tag mit der installierten – ohne Tag passiert nichts, und ein Tag, der
-nicht zur Header-Version passt, führt zu Updates, die sich nicht wegklicken
-lassen.
-
-> **Beim ersten Update prüfen:** Das Theme liegt auf dem Server im Verzeichnis
-> `koehlbrand-theme`, das Repo heißt `koehlbrand_de`. Git Updater benennt den
-> entpackten Ordner normalerweise auf den installierten Theme-Slug um. Falls
-> nach dem ersten Update stattdessen ein zweites Theme-Verzeichnis auftaucht,
-> muss das Theme einmalig unter dem Verzeichnisnamen `koehlbrand_de` neu
-> installiert werden.
+> `docker-compose.yml` aus dem Projektordner gehören bewusst **nicht** hierher.
+> Das Repo ist öffentlich, und ein künftiger Update-Mechanismus würde seinen
+> Inhalt nach `wp-content/themes/` auf den Server entpacken – über HTTP
+> erreichbar.
 
 ## Läuft automatisch bei der Aktivierung
 
