@@ -715,7 +715,19 @@ add_action( 'admin_notices', 'koehlbrand_cmp_notice' );
  *
  * Greift nur, wenn WordPress im Root installiert ist – liegt WP in einem
  * Unterverzeichnis, erreicht der Request `/ads.txt` gar nicht erst PHP und die
- * Datei muss vom Webserver kommen.
+ * Datei muss vom Webserver kommen. Ob das der Fall ist, verrät ein Aufruf von
+ * `/ads.txt`: Kommt die 404-Seite von WordPress, ist PHP erreicht.
+ *
+ * Hängt an `koehlbrand_adsense_publisher_id()`, **nicht** an
+ * `koehlbrand_adsense_client()`: ads.txt ist wie der Verifizierungs-Tag eine
+ * Kontozuordnung und keine Anzeigenauslieferung. Google prüft sie bereits
+ * während der Freischaltung, also lange bevor die erste Anzeige läuft. Eine
+ * ads.txt ohne aktive Anzeigen ist unschädlich – sie erklärt nur, wer Inventar
+ * dieser Domain verkaufen darf.
+ *
+ * In einer Multisite ist dieser Weg der physischen Datei sogar überlegen: Eine
+ * `ads.txt` im gemeinsamen Web-Root würde für alle Domains des Netzwerks
+ * gelten, hier liefert jede Site ihre eigene.
  */
 function koehlbrand_serve_ads_txt() {
 	if ( empty( $_SERVER['REQUEST_URI'] ) ) {
@@ -728,14 +740,14 @@ function koehlbrand_serve_ads_txt() {
 		return;
 	}
 
-	$client = koehlbrand_adsense_client();
+	$id = koehlbrand_adsense_publisher_id();
 
-	if ( '' === $client ) {
+	if ( '' === $id ) {
 		return;
 	}
 
 	// "ca-pub-1234" → "pub-1234"; ads.txt kennt das ca-Präfix nicht.
-	$publisher = preg_replace( '/^ca-/', '', $client );
+	$publisher = preg_replace( '/^ca-/', '', $id );
 
 	$zeilen = array( sprintf( 'google.com, %s, DIRECT, f08c47fec0942fa0', $publisher ) );
 

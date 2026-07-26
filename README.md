@@ -146,6 +146,25 @@ als Live-Site ausgeben soll).
 **Der Tag liefert keine Anzeigen aus.** Er zieht kein Skript nach. Ob Anzeigen
 laufen, hängt allein an `koehlbrand_adsense_client` – siehe unten.
 
+An derselben Publisher-ID hängt auch **`/ads.txt`**: Das Theme liefert sie
+selbst aus, solange keine echte Datei im Web-Root liegt.
+
+```
+google.com, pub-9359612609141957, DIRECT, f08c47fec0942fa0
+```
+
+Auch das ist Kontozuordnung, keine Auslieferung – Google prüft ads.txt bereits
+während der Freischaltung. In einer Multisite ist der Weg über das Theme der
+physischen Datei überlegen: Eine `ads.txt` im gemeinsamen Web-Root würde für
+alle Domains des Netzwerks gelten, so liefert jede Site ihre eigene. Weitere
+Zeilen (andere Vermarkter, Reseller) ergänzt der Filter
+`koehlbrand_ads_txt_lines`.
+
+Voraussetzung ist, dass der Request PHP erreicht. Prüfen lässt sich das durch
+den Aufruf von `/ads.txt`: Kommt eine WordPress-404-Seite, ist PHP erreicht und
+der Mechanismus greift; kommt die 404 des Webservers, liegt WordPress in einem
+Unterverzeichnis und die Datei muss vom Webserver kommen.
+
 ### Reihenfolge bis zur ersten echten Anzeige
 
 1. Meta-Tag ausliefern ✔ (erledigt)
