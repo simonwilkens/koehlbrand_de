@@ -17,9 +17,10 @@ ist ein alter Stand und nicht mehr aktuell.
 
 ## Updates über Git Updater
 
-Der Theme-Code liegt in **`simonwilkens/koehlbrand_de`** (privates Repo, Theme
-im Repo-Root). Das Plugin [Git Updater](https://git-updater.com/) zieht neue
-Versionen direkt von dort und meldet sie als normales Theme-Update im wp-admin.
+Der Theme-Code liegt in **`simonwilkens/koehlbrand_de`** (öffentliches Repo,
+Theme im Repo-Root). Das Plugin [Git Updater](https://github.com/afragen/git-updater)
+zieht neue Versionen direkt von dort und meldet sie als normales Theme-Update
+im wp-admin.
 
 Verdrahtet ist das über zwei Zeilen im Header dieser `style.css`:
 
@@ -30,14 +31,29 @@ GitHub Theme URI: simonwilkens/koehlbrand_de
 
 Einrichtung auf dem Server:
 
-1. Git Updater installieren und aktivieren.
-2. Unter **Einstellungen → Git Updater → GitHub** einen GitHub-Token
-   hinterlegen. Weil das Repo privat ist, geht es ohne nicht. Fine-grained
-   Token, nur dieses eine Repository, Berechtigung **Contents: Read** und
-   **Metadata: Read** – kein Schreibrecht. Der Token liegt dauerhaft in einer
-   WordPress-Option; ein Token mit Push-Rechten hätte dort nichts zu suchen.
-3. Unter **Einstellungen → Git Updater → Übersicht** prüfen, ob das Theme
-   erkannt wird.
+1. Git Updater installieren und aktivieren. Es liegt nicht auf wordpress.org,
+   das ZIP kommt aus den
+   [GitHub-Releases](https://github.com/afragen/git-updater/releases/latest)
+   und wird unter **Plugins → Installieren → Plugin hochladen** eingespielt.
+2. Unter **Einstellungen → Git Updater → Übersicht** prüfen, ob das Theme
+   erkannt wird. Ein Token ist nicht nötig.
+
+> **Warum das Repo öffentlich ist:** Git Updater ist für öffentliche Repos
+> dauerhaft kostenlos. Für **private** Repos braucht es authentifizierte
+> API-Anfragen, und die stellt es nach einer Testphase nur noch mit gekaufter
+> Lizenz. Da das Theme ohnehin unter GPL-2.0-or-later steht, die Schriften
+> unter der OFL weitergegeben werden dürfen und das Repo keine Zugangsdaten
+> enthält, ist ein öffentliches Repo hier der einfachere Weg. Wenn es je privat
+> werden muss, ist [Plugin Update
+> Checker](https://github.com/YahnisElsts/plugin-update-checker) (MIT) die
+> kostenlose Alternative – als Library ins Theme eingebunden statt als Plugin.
+
+> **Keine Zugangsdaten ins Repo.** `branding/`, `technik/` und
+> `docker-compose.yml` aus dem Projektordner gehören bewusst **nicht** hierher:
+> Git Updater entpackt den kompletten Repo-Inhalt bei jedem Update nach
+> `wp-content/themes/`. Alles, was hier liegt, ist damit auf dem Live-Server
+> über HTTP erreichbar – und seit das Repo öffentlich ist, ohnehin für jeden
+> einsehbar.
 
 Ein Update besteht aus zwei Schritten, die zusammengehören: **Version im
 `style.css`-Header hochzählen** und einen **Git-Tag mit derselben Nummer**
