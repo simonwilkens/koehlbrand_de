@@ -77,6 +77,12 @@ function koehlbrand_setup() {
 	// siehe koehlbrand_disable_comments().
 	add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script' ) );
 
+	// Seiten bekommen ein Auszugsfeld. Beiträge haben es von Haus aus, Seiten
+	// nicht – ohne das leitet koehlbrand_meta_description() die Beschreibung
+	// jeder Seite aus dem Fließtext ab. Betrifft die Pillar-Seiten der
+	// Content-Strategie und die Startseite, deren Auszug ihre Description ist.
+	add_post_type_support( 'page', 'excerpt' );
+
 	// Editor lädt dieselben Schriften/Farben wie das Frontend.
 	add_editor_style( 'style.css' );
 

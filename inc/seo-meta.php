@@ -64,7 +64,20 @@ function koehlbrand_meta_description() {
 	$desc = '';
 
 	if ( is_front_page() ) {
-		$desc = get_bloginfo( 'description' );
+		// Ist eine statische Seite als Startseite eingestellt, gilt ihr Auszug.
+		// Der Untertitel muss sonst zwei Felder mit gegensätzlichen Längen
+		// bedienen: Er steckt auch im <title> ("Name – Untertitel", ab rund 60
+		// Zeichen abgeschnitten), während die Description bis 155 Zeichen trägt.
+		// Der Auszug trennt beides, ohne eine eigene Option zu erfinden.
+		//
+		// Der Fließtext-Rückfall aus dem is_singular()-Zweig taugt hier nicht:
+		// front-page.html gibt den Seiteninhalt gar nicht aus, er kann also
+		// beliebig weit von dem abweichen, was Besucher sehen.
+		$front = is_singular() ? get_queried_object() : null;
+
+		$desc = ( $front instanceof WP_Post && '' !== trim( (string) $front->post_excerpt ) )
+			? $front->post_excerpt
+			: get_bloginfo( 'description' );
 	} elseif ( is_singular() ) {
 		$post = get_queried_object();
 
