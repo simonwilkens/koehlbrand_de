@@ -263,6 +263,48 @@ Web-Root hat Vorrang.
 > `koehlbrand_cmp` (läuft im `<head>` vor dem AdSense-Loader). Solange
 > AdSense aktiv ist und dort nichts hängt, warnt das Backend.
 
+## Reichweitenmessung (`inc/analytics.php`)
+
+Google Analytics 4. Das gtag.js-Snippet steht auf jeder Frontend-Seite im
+`<head>`, dazu Preconnects auf `googletagmanager.com` und
+`google-analytics.com`:
+
+```html
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZZ7G738S9"></script>
+```
+
+Die Mess-ID steht – wie die AdSense-Publisher-ID und aus demselben Grund – als
+Standardwert im Code (`KOEHLBRAND_GA4_MEASUREMENT_ID`) statt nur in einer
+Option: Die Messung soll laufen, sobald das Theme aktiv ist, und nicht
+stillschweigend ausfallen, weil beim Aufsetzen ein Options-Eintrag fehlt.
+Überschreiben geht per Option `koehlbrand_ga4_id` oder gleichnamigem Filter;
+ein leerer Wert schaltet die Messung ab – der Weg für die lokale
+Docker-Instanz, deren Aufrufe sonst in der Statistik landen:
+
+```php
+add_filter( 'koehlbrand_ga4_id', fn() => '' );
+```
+
+Angemeldete Redakteure werden **nicht** ausgenommen. In der Testphase sind die
+eigenen Aufrufe die einzigen, die es gibt – eine Ausnahme hieße, dass in GA4
+nichts ankommt und die Einbindung fälschlich als kaputt gilt. Sobald echter
+Traffic läuft, schaltet dieser Filter die eigenen Besuche aus:
+
+```php
+add_filter( 'koehlbrand_ga4_enabled', function ( $an ) {
+	return is_user_logged_in() ? false : $an;
+} );
+```
+
+> **Kein Consent-Banner** – Entscheidung vom 26.07.2026, bewusste
+> Übergangslösung für die Entwicklungs- und Testphase. Vor dem Produktivbetrieb
+> steht ein Wechsel der Tracking-Lösung samt sauberer Consent-Umsetzung an.
+> Bis dahin gilt: Die **Datenschutzerklärung muss GA4 benennen** (Verarbeitung,
+> Empfänger, US-Transfer, Widerspruch). Ihr Abschnitt 5 sagt derzeit das
+> Gegenteil – „bindet derzeit keine Analyse-Werkzeuge ein" –, und solange dort
+> das Wort „Analytics" fehlt, warnt das Backend. Wer doch früher eine CMP
+> einhängt: Der Hook `koehlbrand_cmp` läuft im `<head>` vor gtag.js.
+
 ## Lesezeit, Inhaltsverzeichnis, Artikel-Navigation, Empfehlungen
 
 Vier Bausteine gegen den Absprung nach dem ersten Absatz. Alle vier rechnen zur
@@ -319,8 +361,9 @@ add_filter( 'koehlbrand_related_weights', function ( $w ) {
 ## Struktur
 
 - `theme.json` – Farben, Schriften, Abstände (1:1 aus den Design-Tokens)
-- `inc/` – SEO (Meta-Tags, Open Graph, JSON-LD), Brotkrumen, Werbeplätze sowie
-  Lesezeit, Inhaltsverzeichnis, Artikel-Navigation und Empfehlungen. Bewusst
+- `inc/` – SEO (Meta-Tags, Open Graph, JSON-LD), Brotkrumen, Werbeplätze,
+  Reichweitenmessung sowie Lesezeit, Inhaltsverzeichnis, Artikel-Navigation
+  und Empfehlungen. Bewusst
   theme-nativ statt Yoast/RankMath, weil die Artikel automatisiert über die
   REST API entstehen und die Pipeline sonst plugin-spezifische Metafelder
   befüllen müsste.

@@ -28,6 +28,7 @@ require_once get_theme_file_path( 'inc/seo-meta.php' );
 require_once get_theme_file_path( 'inc/seo-schema.php' );
 require_once get_theme_file_path( 'inc/breadcrumbs.php' );
 require_once get_theme_file_path( 'inc/ads.php' );
+require_once get_theme_file_path( 'inc/analytics.php' );
 
 /**
  * Bausteine für die Verweildauer: Lesezeit, Inhaltsverzeichnis,
