@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.3.3
+Version: 1.3.4
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -173,6 +173,20 @@ footer .koehlbrand-brand__word {
 	font-size: 1rem;
 }
 
+
+/* -------------------------------------------------------------------------
+   Themenseiten auf der Startseite
+
+   Drei Karten, die auf die laufend gepflegten Übersichtsseiten verweisen.
+   Die Spalten des Kernblocks sind bereits gleich hoch, die Gruppe darin ist
+   es nicht – sie wächst nur mit ihrem Text. Gemessen: 230, 199 und 177px,
+   was die farbigen Flächen ausgefranst aussehen lässt. `height: 100%` zieht
+   sie auf die Höhe der längsten Karte.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-themenseiten .wp-block-column > .wp-block-group {
+	height: 100%;
+}
 
 /* -------------------------------------------------------------------------
    Rubrikzeile (zweite Header-Zeile)
