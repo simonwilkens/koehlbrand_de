@@ -201,13 +201,17 @@ add_action( 'wp_head', 'koehlbrand_head_meta', 2 );
  * Autoren- und Datumsarchive erzeugen bei einem Portal mit einer Handvoll
  * Autoren nur Duplicate Content – auf noindex, Links aber weiterverfolgen.
  *
+ * Leere Term-Archive ebenso: WordPress liefert für sie HTTP 200 mit einer
+ * Seite ohne Inhalt. Betrifft vor allem die Standardkategorie „Allgemein“,
+ * die sich nicht löschen lässt, aber im Portal keine Rolle spielt.
+ *
  * Paginierte Archive bleiben bewusst indexierbar: sie auf noindex zu setzen
  * ist verbreitet, aber veraltet – Google verliert dadurch den Zugang zu
  * älteren Artikeln. Stattdessen sorgt koehlbrand_current_url() für ein
  * selbstreferenzierendes Canonical pro Seite.
  */
 function koehlbrand_robots( $robots ) {
-	if ( is_author() || is_date() ) {
+	if ( is_author() || is_date() || koehlbrand_is_empty_term_archive() ) {
 		$robots['noindex'] = true;
 		$robots['follow']  = true;
 		unset( $robots['index'], $robots['nofollow'] );
@@ -223,6 +227,22 @@ function koehlbrand_robots( $robots ) {
 	return $robots;
 }
 add_filter( 'wp_robots', 'koehlbrand_robots' );
+
+/**
+ * Term-Archiv ohne einen einzigen Beitrag?
+ *
+ * `count` zählt nur veröffentlichte Beiträge, Entwürfe bleiben außen vor –
+ * genau das, was hier gebraucht wird.
+ */
+function koehlbrand_is_empty_term_archive() {
+	if ( ! is_category() && ! is_tag() && ! is_tax() ) {
+		return false;
+	}
+
+	$term = get_queried_object();
+
+	return $term instanceof WP_Term && 0 === (int) $term->count;
+}
 
 /**
  * Autoren-Sitemap entfernen – die Archive sind noindex, also gehören sie
