@@ -92,7 +92,12 @@ add_action( 'init', 'koehlbrand_register_reading_time_block' );
 function koehlbrand_render_reading_time_block( $attributes = array(), $content = '', $block = null ) {
 	$post_id = $block->context['postId'] ?? get_the_ID();
 
-	if ( ! $post_id || 'post' !== get_post_type( $post_id ) ) {
+	// Seiten sind eingeschlossen, weil die Pillar-Seiten der Content-Strategie
+	// Seiten sind. Für kurze Seiten wie das Impressum steht dann „1 Min.“ –
+	// unauffällig, aber ehrlich.
+	$typen = (array) apply_filters( 'koehlbrand_reading_time_post_types', array( 'post', 'page' ) );
+
+	if ( ! $post_id || ! in_array( get_post_type( $post_id ), $typen, true ) ) {
 		return '';
 	}
 

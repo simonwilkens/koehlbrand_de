@@ -1,17 +1,43 @@
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
 
-<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"var:preset|spacing|lg","bottom":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
-<main class="wp-block-group" style="padding-top:var(--wp--preset--spacing--lg);padding-bottom:var(--wp--preset--spacing--xl)">
+<!-- wp:group {"align":"full","layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignfull">
+	<!-- wp:koehlbrand/ad-slot {"slot":"header","align":"wide"} /-->
+</div>
+<!-- /wp:group -->
 
-	<!-- wp:koehlbrand/breadcrumbs {"fontSize":"small"} /-->
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group">
 
-	<!-- wp:post-title {"level":1} /-->
+	<!-- wp:group {"align":"wide","className":"koehlbrand-layout","style":{"spacing":{"padding":{"top":"var:preset|spacing|lg","bottom":"var:preset|spacing|xl"}}},"layout":{"type":"default"}} -->
+	<div class="wp-block-group alignwide koehlbrand-layout" style="padding-top:var(--wp--preset--spacing--lg);padding-bottom:var(--wp--preset--spacing--xl)">
 
-	<!-- wp:separator {"textColor":"fog"} -->
-	<hr class="wp-block-separator has-text-color has-fog-color has-alpha-channel-opacity"/>
-	<!-- /wp:separator -->
+		<!-- wp:group {"className":"koehlbrand-layout__main","layout":{"type":"constrained","contentSize":"720px"}} -->
+		<div class="wp-block-group koehlbrand-layout__main">
 
-	<!-- wp:post-content {"layout":{"type":"constrained"}} /-->
+			<!-- wp:koehlbrand/breadcrumbs {"fontSize":"small"} /-->
+
+			<!-- wp:post-title {"level":1} /-->
+
+			<!-- wp:koehlbrand/reading-time {"fontSize":"small","textColor":"steel"} /-->
+
+			<!-- wp:separator {"textColor":"fog"} -->
+			<hr class="wp-block-separator has-text-color has-fog-color has-alpha-channel-opacity"/>
+			<!-- /wp:separator -->
+
+			<!-- wp:koehlbrand/toc /-->
+
+			<!-- wp:post-content {"layout":{"type":"constrained"}} /-->
+
+			<!-- wp:koehlbrand/ad-slot {"slot":"end-of-article"} /-->
+
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:template-part {"slug":"sidebar","tagName":"aside","className":"koehlbrand-layout__aside"} /-->
+
+	</div>
+	<!-- /wp:group -->
 
 </main>
 <!-- /wp:group -->

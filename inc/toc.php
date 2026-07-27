@@ -16,6 +16,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Inhaltstypen mit Inhaltsverzeichnis.
+ *
+ * Seiten sind bewusst dabei: Die Pillar-Seiten der Content-Strategie
+ * (`/koehlbrandbruecke/`, `/koehlbrandquerung/`, `/sperrungen/`) sind Seiten
+ * und mit über 20 Überschriften genau die Textsorte, für die das Verzeichnis
+ * gebaut wurde. Kurze Seiten wie das Impressum fallen ohnehin unter die
+ * Mindestzahl an Überschriften und bekommen keins.
+ */
+function koehlbrand_toc_post_types() {
+	return (array) apply_filters( 'koehlbrand_toc_post_types', array( 'post', 'page' ) );
+}
+
+/**
  * Ab wie vielen Überschriften sich ein Verzeichnis lohnt.
  *
  * Bei zwei Zwischenüberschriften ist der Kasten größer als der Nutzen – der
@@ -134,7 +147,7 @@ function koehlbrand_toc_items( $post = null ) {
  * Absicht deutlich.
  */
 function koehlbrand_add_heading_anchors( $content ) {
-	if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() || is_feed() ) {
+	if ( ! is_singular( koehlbrand_toc_post_types() ) || ! in_the_loop() || ! is_main_query() || is_feed() ) {
 		return $content;
 	}
 
@@ -195,7 +208,7 @@ add_action( 'init', 'koehlbrand_register_toc_block' );
  * Frontend-Ausgabe.
  */
 function koehlbrand_render_toc_block( $attributes = array(), $content = '', $block = null ) {
-	if ( ! is_singular( 'post' ) ) {
+	if ( ! is_singular( koehlbrand_toc_post_types() ) ) {
 		return '';
 	}
 

@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.3.2
+Version: 1.3.3
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -454,9 +454,15 @@ footer .koehlbrand-brand__word {
    und nicht aus dem Markup, damit er beim Umbruch auf schmalen Displays nicht
    allein in einer Zeile landet und damit die Angabe ohne ihn auskommt, wenn
    sie einmal an anderer Stelle steht.
+
+   Deshalb hängt er am Datum als direktem Vorgänger und nicht an einem
+   Gruppen-Wrapper: Auf Seiten steht die Lesezeit allein unter dem Titel, und
+   ein Trennpunkt ohne etwas davor sähe nach einem Darstellungsfehler aus.
+   Ein Wrapper taugt als Bedingung nicht – im Block-Theme ist praktisch jeder
+   Container eine `wp-block-group`.
    ---------------------------------------------------------------------- */
 
-.wp-block-group .koehlbrand-reading-time::before {
+.wp-block-post-date + .koehlbrand-reading-time::before {
 	content: "·";
 	margin-right: 0.5em;
 	color: inherit;
