@@ -5,12 +5,12 @@
 	"title": "Nächste Vollsperrung",
 	"category": "theme",
 	"icon": "warning",
-	"description": "Der nächste anstehende Sperrtermin aus der gepflegten Terminliste. Gehört in die Seitenleiste. Ohne künftigen Termin rendert der Block nichts.",
+	"description": "Der nächste anstehende Sperrtermin aus der gepflegten Terminliste. Steht in der Seitenleiste und als breiter Streifen unter dem Aufmacher der Startseite. Ohne künftigen Termin rendert der Block nichts.",
 	"textdomain": "koehlbrand",
 	"keywords": [ "sperrung", "vollsperrung", "termin", "elbtunnel", "umleitung" ],
 	"supports": {
 		"html": false,
-		"align": false,
+		"align": [ "wide" ],
 		"color": { "text": true, "background": true },
 		"spacing": { "margin": true, "padding": true },
 		"typography": { "fontSize": true }

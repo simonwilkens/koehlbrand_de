@@ -169,6 +169,26 @@ function koehlbrand_sperrung_kollision( $termin ) {
 }
 
 /**
+ * Läuft der Termin bereits oder beginnt er innerhalb des Vorlaufs?
+ *
+ * Seit 1.9.0 steht der Kasten auch auf der Startseite, und dort elf Monate im
+ * Jahr über einem Termin, der Wochen entfernt ist. Ohne Abstufung gewöhnt sich
+ * das Auge daran und übersieht ihn genau dann, wenn er zählt. Innerhalb des
+ * Vorlaufs ist der Kasten deshalb ein Hinweis, davor eine Terminangabe.
+ */
+function koehlbrand_sperrung_ist_dringend( $termin ) {
+	$jetzt = current_datetime();
+
+	if ( $termin['beginn'] <= $jetzt ) {
+		return true;
+	}
+
+	$tage = (int) apply_filters( 'koehlbrand_sperrung_vorlauf_tage', 7 );
+
+	return ( $termin['beginn']->getTimestamp() - $jetzt->getTimestamp() ) <= $tage * DAY_IN_SECONDS;
+}
+
+/**
  * Zeitraum als Text: „Fr 11.09., 21:00 – Mo 14.09., 05:00“.
  */
 function koehlbrand_sperrung_zeitraum( $termin ) {
@@ -231,7 +251,21 @@ function koehlbrand_render_next_closure_block( $attributes = array(), $content =
 	$laeuft    = $termin['beginn'] <= current_datetime();
 	$kollision = koehlbrand_sperrung_kollision( $termin );
 	$url       = koehlbrand_sperrungen_url();
-	$wrapper   = get_block_wrapper_attributes( array( 'class' => 'koehlbrand-closure' ) );
+	$klassen   = array( 'koehlbrand-closure' );
+
+	if ( koehlbrand_sperrung_ist_dringend( $termin ) ) {
+		$klassen[] = 'koehlbrand-closure--dringend';
+	}
+
+	// Die Breitenvariante kommt als `className` aus der Vorlage (Startseite),
+	// die Ausrichtung dagegen nicht: Für dynamische Blöcke setzt WordPress die
+	// `alignwide`-Klasse nicht selbst – das erledigt beim statischen Block der
+	// Editor beim Speichern.
+	if ( ! empty( $attributes['align'] ) ) {
+		$klassen[] = 'align' . $attributes['align'];
+	}
+
+	$wrapper = get_block_wrapper_attributes( array( 'class' => implode( ' ', $klassen ) ) );
 
 	$innen  = sprintf(
 		'<p class="koehlbrand-closure__label">%s</p>',

@@ -358,6 +358,53 @@ add_filter( 'koehlbrand_related_weights', function ( $w ) {
 > **Schlagwörter** fällt die Rangfolge auf Rubrik und Aktualität zurück, ohne
 > **H2-Zwischenüberschriften** erscheint kein Inhaltsverzeichnis.
 
+## Sperrungen (`inc/closures.php`)
+
+Die Termine der Vollsperrungen stehen als Datenliste in der Option
+`koehlbrand_sperrungen`, **nicht** im Seitentext. Zwei Blöcke lesen dieselbe
+Quelle, damit sie nicht auseinanderlaufen können:
+
+| Block | Zeigt | Steht in |
+|---|---|---|
+| `koehlbrand/next-closure` | den nächsten oder laufenden Termin | `parts/sidebar.html` und, als breiter Streifen, in `templates/front-page.html` unter dem Aufmacher |
+| `koehlbrand/closure-table` | alle künftigen Termine als Tabelle | `/sperrungen/` |
+
+**Der wöchentliche Pflegeschritt beschränkt sich auf die Option.** Vergangene
+Termine fallen von selbst heraus – maßgeblich ist das Ende, nicht der Beginn,
+damit eine laufende Sperrung sichtbar bleibt. **Ohne künftigen Termin rendert
+der Kasten nichts**: kein leerer Rahmen, kein „Stand unbekannt“.
+
+Fällt eine Sperrung der Köhlbrandbrücke mit einer des Elbtunnels zusammen,
+ergänzt der Kasten von selbst den Hinweis, dass für den Schwerlastverkehr keine
+Ausweichroute bleibt. Das ist der Daseinsgrund des Bausteins: Die Termine
+stammen von der Hamburg Port Authority und der Autobahn GmbH, und keine der
+beiden Quellen kennt die andere.
+
+**Zwei Darstellungen, eine Auszeichnung.** In der Seitenleiste steht der Kasten
+gestapelt, auf der Startseite über die volle Breite (`className`
+`koehlbrand-closure--breit`, ab 900px einzeilig; darunter fällt er in die
+gestapelte Form zurück). Innerhalb des Vorlaufs – Vorgabe sieben Tage – wird er
+kräftiger hinterlegt, weil er auf der Startseite dauerhaft steht und ein Termin
+in acht Wochen sonst so aussieht wie der am Freitag:
+
+```php
+add_filter( 'koehlbrand_sperrung_vorlauf_tage', fn() => 14 );
+```
+
+Die Termine lassen sich vor der Ausgabe auch programmatisch ergänzen oder
+ersetzen, etwa aus einer künftigen Datenquelle:
+
+```php
+add_filter( 'koehlbrand_sperrungen', function ( $termine ) {
+	$termine[] = array(
+		'bauwerk' => 'Köhlbrandbrücke',
+		'beginn'  => '2026-10-16 21:00',
+		'ende'    => '2026-10-19 05:00',
+	);
+	return $termine;
+} );
+```
+
 ## Struktur
 
 - `theme.json` – Farben, Schriften, Abstände (1:1 aus den Design-Tokens)
@@ -373,11 +420,13 @@ add_filter( 'koehlbrand_related_weights', function ( $w ) {
   ebenfalls unter „Design“
 - `blocks/reading-time/`, `blocks/toc/`, `blocks/post-nav/` – Lesezeit,
   Inhaltsverzeichnis und Artikel-Navigation, ebenfalls unter „Design“
+- `blocks/next-closure/`, `blocks/closure-table/` – nächste Vollsperrung und
+  Terminübersicht, beide aus der Option `koehlbrand_sperrungen`
 - `templates/` – Startseite, Artikel, Seite, Rubrik-Archiv, Suche, 404
 - `parts/` – Header, Footer und Sidebar. Die Sidebar erscheint auf Artikel-
-  und Rubrikseiten neben dem Text (ab 1100px Fensterbreite) und enthält
-  aktuell nur den Werbeplatz; redaktionelle Module können dort ergänzt werden
-  und stapeln sich mobil unter dem Artikel.
+  und Rubrikseiten neben dem Text (ab 1100px Fensterbreite) und enthält den
+  Kasten „Nächste Vollsperrung“ über dem Werbeplatz; weitere redaktionelle
+  Module können dort ergänzt werden und stapeln sich mobil unter dem Artikel.
 - `patterns/` – Fakten-Box, Bild mit Fotocredit, CTA-Kasten (im Editor unter
   Kategorie „Köhlbrand“ zu finden)
 - `assets/fonts/` – Barlow Semi Condensed & IBM Plex Sans, selbst gehostet (kein

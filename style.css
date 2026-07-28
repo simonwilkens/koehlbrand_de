@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.8.0
+Version: 1.9.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -554,6 +554,65 @@ footer .koehlbrand-brand__word {
 
 .koehlbrand-closure__mehr {
 	font-size: 0.875rem;
+}
+
+/* Dringlichkeit: Der Termin läuft oder beginnt innerhalb des Vorlaufs
+   (`koehlbrand_sperrung_vorlauf_tage`, Vorgabe 7 Tage). Nötig geworden mit der
+   Startseite: Dort steht der Kasten dauerhaft, und ein Termin im September darf
+   im Juli nicht so aussehen wie am Donnerstag davor. Kein Rot, keine zweite
+   Farbe – dasselbe Amber, nur breiter, heller hinterlegt und mit dunklerem
+   Label. */
+.koehlbrand-closure--dringend {
+	border-left-width: 6px;
+	/* Amber zu 15 % auf Sandbeige. Als Preset nicht vorhanden und auch keins
+	   wert: Die Farbe hat genau diesen einen Einsatzort. */
+	background: #EBDBC2;
+}
+
+.koehlbrand-closure--dringend .koehlbrand-closure__label {
+	color: var(--wp--preset--color--ink);
+}
+
+/* Breitenvariante für die Startseite: derselbe Kasten als Streifen unter dem
+   Aufmacher. Flex statt Grid, weil Kollisionswarnung und Link je nach Termin
+   fehlen – ein festes Raster bräuchte für jede Kombination eine eigene Regel.
+
+   Erst ab 900px: Darunter ist der Streifen schmaler als seine vier Angaben
+   zusammen, und der Kasten bleibt in der gestapelten Form aus der Seitenleiste.
+   Genau das ist auf dem Handy auch die richtige: Er steht dort direkt unter dem
+   Aufmacher und damit an der Stelle, an der die Frage „ist gerade gesperrt?“
+   gestellt wird. */
+@media (min-width: 900px) {
+	.koehlbrand-closure--breit {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		column-gap: var(--wp--preset--spacing--md);
+	}
+
+	.koehlbrand-closure--breit > * {
+		margin-bottom: 0;
+	}
+
+	/* `order` zieht den Link in die erste Zeile, obwohl er im Markup hinter der
+	   Warnung steht – sonst steht er allein auf einer dritten Zeile und der
+	   Streifen ist höher als der Kasten in der Seitenleiste. Die Reihenfolge
+	   für Screenreader bleibt die des Markups; da nur ein Element fokussierbar
+	   ist, entsteht dabei keine abweichende Tab-Reihenfolge. */
+	.koehlbrand-closure--breit .koehlbrand-closure__mehr {
+		order: 1;
+		margin-left: auto;
+	}
+
+	/* Die Warnung ist der eigentliche Daseinsgrund des Kastens – zwei
+	   gleichzeitig gesperrte Elbquerungen nennt sonst keine Quelle. Sie
+	   bekommt deshalb ihre eigene Zeile über die volle Breite statt zwischen
+	   Zeitraum und Link eingequetscht zu werden. */
+	.koehlbrand-closure--breit .koehlbrand-closure__warnung {
+		order: 2;
+		flex-basis: 100%;
+		margin-top: 0.625rem;
+	}
 }
 
 /* Die Tabelle auf /sperrungen/ – scrollt auf schmalen Displays in sich selbst,
