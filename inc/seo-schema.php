@@ -120,19 +120,116 @@ function koehlbrand_schema_organization( $org_id ) {
  * theoretischer Fall: über die REST API angelegte Beiträge bekommen ohne
  * ausdrücklich gesetztes post_author die ID 0 – ein leeres author-Feld macht
  * das Article-Rich-Result bei Google ungültig.
+ *
+ * Der Typ ist `Organization` und nicht `Person`: Hinter den Beiträgen steht die
+ * „Köhlbrand Redaktion“, kein benannter Mensch. Ein Person-Knoten ohne
+ * Nachname, Profil oder Belege behauptet eine Urheberschaft, die sich nicht
+ * einlösen lässt – und maschinelle Leser bewerten genau das. Die `url` zeigt
+ * auf die Redaktionsseite, damit „wer ist das?“ eine Antwort hat.
  */
 function koehlbrand_schema_author( $org_id ) {
 	$author_id   = (int) get_post_field( 'post_author' );
 	$author_name = $author_id ? get_the_author_meta( 'display_name', $author_id ) : '';
 
-	if ( '' !== trim( (string) $author_name ) ) {
-		return array(
-			'@type' => 'Person',
-			'name'  => $author_name,
-		);
+	if ( '' === trim( (string) $author_name ) ) {
+		return array( '@id' => $org_id );
 	}
 
-	return array( '@id' => $org_id );
+	$autor = array(
+		'@type' => 'Organization',
+		'name'  => $author_name,
+	);
+
+	$ueber_uns = get_page_by_path( 'ueber-uns' );
+	if ( $ueber_uns instanceof WP_Post && 'publish' === $ueber_uns->post_status ) {
+		$autor['url'] = get_permalink( $ueber_uns );
+	}
+
+	return $autor;
+}
+
+/**
+ * Frage-Antwort-Paare aus dem Inhalt als FAQPage-Knoten.
+ *
+ * Regel: Eine Überschrift der Ebene 3, die auf ein Fragezeichen endet, gilt als
+ * Frage; alles bis zur nächsten Überschrift ist die Antwort. Damit entsteht die
+ * Auszeichnung aus dem Text selbst – die Redaktion muss nichts zusätzlich
+ * pflegen, und es kann nicht auseinanderlaufen.
+ *
+ * Warum überhaupt: Googles FAQ-Rich-Result ist seit 2023 auf wenige
+ * Website-Kategorien beschränkt, in der Suchergebnisliste ist davon also kaum
+ * etwas zu erwarten. Der Wert liegt woanders – Antwortmaschinen und
+ * LLM-Crawler lesen strukturierte Frage-Antwort-Paare als abgeschlossene
+ * Aussagen, statt sie aus dem Fließtext schätzen zu müssen. Die sechs Beiträge
+ * und die Pillar-Seiten enthalten über dreißig solcher Paare.
+ */
+function koehlbrand_schema_faq( $post = null ) {
+	$post = get_post( $post );
+
+	if ( ! $post ) {
+		return null;
+	}
+
+	$eintraege = array();
+	$frage     = '';
+	$antwort   = array();
+
+	$abschliessen = static function () use ( &$eintraege, &$frage, &$antwort ) {
+		$text = trim( implode( ' ', $antwort ) );
+
+		if ( '' !== $frage && '' !== $text ) {
+			$eintraege[] = array(
+				'@type'          => 'Question',
+				'name'           => $frage,
+				'acceptedAnswer' => array(
+					'@type' => 'Answer',
+					'text'  => $text,
+				),
+			);
+		}
+
+		$frage   = '';
+		$antwort = array();
+	};
+
+	foreach ( parse_blocks( $post->post_content ) as $block ) {
+		$name = $block['blockName'] ?? '';
+
+		if ( 'core/heading' === $name ) {
+			$abschliessen();
+
+			$stufe = (int) ( $block['attrs']['level'] ?? 2 );
+			$titel = trim( wp_strip_all_tags( render_block( $block ) ) );
+
+			// Kein str_ends_with(): Das Netzwerk läuft auf PHP 7.4, die
+			// Funktion kam erst mit 8.0.
+			if ( 3 === $stufe && '?' === substr( $titel, -1 ) ) {
+				$frage = $titel;
+			}
+
+			continue;
+		}
+
+		if ( '' === $frage ) {
+			continue;
+		}
+
+		if ( in_array( $name, array( 'core/paragraph', 'core/list' ), true ) ) {
+			$antwort[] = trim( wp_strip_all_tags( render_block( $block ) ) );
+		}
+	}
+
+	$abschliessen();
+
+	if ( count( $eintraege ) < 2 ) {
+		return null;
+	}
+
+	return array(
+		'@type'      => 'FAQPage',
+		'@id'        => get_permalink( $post ) . '#faq',
+		'mainEntity' => $eintraege,
+	);
 }
 
 /**
@@ -215,6 +312,52 @@ function koehlbrand_json_ld() {
 		}
 
 		$graph[] = $article;
+	}
+
+	// Seiten bekommen einen WebPage-Knoten.
+	//
+	// Bis v1.4.1 galt der Article-Zweig nur für Beiträge – ausgerechnet die
+	// Pillar-Seiten, die längsten und am häufigsten aktualisierten Inhalte der
+	// Website, standen damit ohne Autor, ohne Änderungsdatum und ohne
+	// Beschreibung im Graphen. `WebPage` statt `Article`, weil derselbe Zweig
+	// auch Impressum und Datenschutz erfasst; für die wäre `Article` falsch.
+	if ( is_page() ) {
+		$permalink = get_permalink();
+
+		$seite = array(
+			'@type'            => 'WebPage',
+			'@id'              => $permalink . '#webpage',
+			'isPartOf'         => array( '@id' => $site_id ),
+			'mainEntityOfPage' => array( '@id' => $permalink ),
+			'name'             => wp_strip_all_tags( get_the_title() ),
+			'datePublished'    => get_the_date( 'c' ),
+			'dateModified'     => get_the_modified_date( 'c' ),
+			'author'           => koehlbrand_schema_author( $org_id ),
+			'publisher'        => array( '@id' => $org_id ),
+			'inLanguage'       => get_bloginfo( 'language' ),
+		);
+
+		$desc = koehlbrand_meta_description();
+		if ( '' !== $desc ) {
+			$seite['description'] = $desc;
+		}
+
+		$woerter = koehlbrand_word_count();
+		if ( $woerter > 0 ) {
+			$seite['wordCount']    = $woerter;
+			$seite['timeRequired'] = 'PT' . koehlbrand_reading_time() . 'M';
+		}
+
+		$graph[] = $seite;
+	}
+
+	// Frage-Antwort-Paare aus Beiträgen und Seiten.
+	if ( is_singular( array( 'post', 'page' ) ) ) {
+		$faq = koehlbrand_schema_faq();
+
+		if ( $faq ) {
+			$graph[] = $faq;
+		}
 	}
 
 	$crumbs = koehlbrand_breadcrumb_items();
