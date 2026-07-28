@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.9.0
+Version: 1.10.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -177,7 +177,7 @@ footer .koehlbrand-brand__word {
 /* -------------------------------------------------------------------------
    Themenseiten auf der Startseite
 
-   Drei Karten, die auf die laufend gepflegten Übersichtsseiten verweisen.
+   Vier Karten, die auf die laufend gepflegten Übersichtsseiten verweisen.
    Die Spalten des Kernblocks sind bereits gleich hoch, die Gruppe darin ist
    es nicht – sie wächst nur mit ihrem Text. Gemessen: 230, 199 und 177px,
    was die farbigen Flächen ausgefranst aussehen lässt. `height: 100%` zieht
@@ -186,6 +186,25 @@ footer .koehlbrand-brand__word {
 
 .koehlbrand-themenseiten .wp-block-column > .wp-block-group {
 	height: 100%;
+}
+
+/* Mit der vierten Karte (1.10.0) wird eine Reihe zu eng: Der Abschnitt steht
+   in der 720px-Textspalte, vier Spalten wären dort je 162px breit – „Die
+   Köhlbrandbrücke“ bräuchte dann drei Zeilen für die Überschrift allein.
+   Deshalb 2×2 statt 1×4. Der Kernblock setzt `flex-basis: 0` auf die Spalten
+   und verteilt sie in eine Reihe – das lässt sich über die Spezifität
+   aushebeln. Beim Umbruch geht das nicht: Core setzt ab 782px
+   `flex-wrap: nowrap !important`, dagegen hilft nur ein eigenes `!important`.
+   Unter 782px stapelt WordPress ohnehin. */
+@media (min-width: 782px) {
+	.koehlbrand-themenseiten.wp-block-columns {
+		flex-wrap: wrap !important;
+	}
+
+	.koehlbrand-themenseiten.wp-block-columns > .wp-block-column {
+		flex-basis: calc(50% - var(--wp--style--block-gap, 1.5rem) / 2);
+		flex-grow: 0;
+	}
 }
 
 /* -------------------------------------------------------------------------
