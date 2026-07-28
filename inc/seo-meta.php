@@ -214,9 +214,10 @@ add_action( 'wp_head', 'koehlbrand_head_meta', 2 );
  * Autoren- und Datumsarchive erzeugen bei einem Portal mit einer Handvoll
  * Autoren nur Duplicate Content – auf noindex, Links aber weiterverfolgen.
  *
- * Leere Term-Archive ebenso: WordPress liefert für sie HTTP 200 mit einer
- * Seite ohne Inhalt. Betrifft vor allem die Standardkategorie „Allgemein“,
- * die sich nicht löschen lässt, aber im Portal keine Rolle spielt.
+ * Dünn besetzte Term-Archive ebenso – Schwelle und Begründung bei
+ * koehlbrand_is_thin_term_archive(). Betrifft neben frisch angelegten
+ * Schlagwörtern vor allem die Standardkategorie „Allgemein“, die sich nicht
+ * löschen lässt, aber im Portal keine Rolle spielt.
  *
  * Paginierte Archive bleiben bewusst indexierbar: sie auf noindex zu setzen
  * ist verbreitet, aber veraltet – Google verliert dadurch den Zugang zu
@@ -224,7 +225,7 @@ add_action( 'wp_head', 'koehlbrand_head_meta', 2 );
  * selbstreferenzierendes Canonical pro Seite.
  */
 function koehlbrand_robots( $robots ) {
-	if ( is_author() || is_date() || koehlbrand_is_empty_term_archive() ) {
+	if ( is_author() || is_date() || koehlbrand_is_thin_term_archive() ) {
 		$robots['noindex'] = true;
 		$robots['follow']  = true;
 		unset( $robots['index'], $robots['nofollow'] );
@@ -247,15 +248,73 @@ add_filter( 'wp_robots', 'koehlbrand_robots' );
  * `count` zählt nur veröffentlichte Beiträge, Entwürfe bleiben außen vor –
  * genau das, was hier gebraucht wird.
  */
-function koehlbrand_is_empty_term_archive() {
+function koehlbrand_term_archive_min_posts() {
+	return max( 1, (int) apply_filters( 'koehlbrand_term_archive_min_posts', 2 ) );
+}
+
+/**
+ * Term-Archiv mit zu wenig Inhalt, um eigenständig zu sein?
+ *
+ * Bis v1.7.1 griff das nur bei **leeren** Archiven. Zu wenig: Am 28.07.2026
+ * hingen zehn von dreizehn Schlagwörtern an genau einem Beitrag. Ein Archiv mit
+ * einem einzigen Eintrag ist inhaltlich eine Kopie dieses Beitrags – Titel,
+ * Auszug, Bild, sonst nichts. Bei sechs Artikeln standen damit mehr dünne
+ * Archivseiten zur Indexierung an als echte Inhalte.
+ *
+ * Die Schwelle wirkt in beide Richtungen: Sobald ein Schlagwort den zweiten
+ * Beitrag bekommt, wird sein Archiv von selbst wieder indexierbar. Es muss also
+ * niemand daran denken, das später zurückzunehmen.
+ *
+ * `count` zählt nur veröffentlichte Beiträge – genau das, was hier gebraucht
+ * wird.
+ */
+function koehlbrand_is_thin_term_archive() {
 	if ( ! is_category() && ! is_tag() && ! is_tax() ) {
 		return false;
 	}
 
 	$term = get_queried_object();
 
-	return $term instanceof WP_Term && 0 === (int) $term->count;
+	return $term instanceof WP_Term && (int) $term->count < koehlbrand_term_archive_min_posts();
 }
+
+/**
+ * Dieselben dünnen Archive aus der Sitemap nehmen.
+ *
+ * Eine URL anzumelden und ihr dann `noindex` mitzugeben, ist ein Widerspruch:
+ * Die Search Console meldet sie als „durch noindex-Tag ausgeschlossen“, und der
+ * Bericht füllt sich mit Zeilen, die keine Arbeit auslösen. WordPress bietet
+ * keinen Mindestzähler für die Term-Abfrage, deshalb der Umweg über `exclude`.
+ */
+function koehlbrand_sitemap_skip_thin_terms( $args, $taxonomy ) {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => false,
+		)
+	);
+
+	if ( is_wp_error( $terms ) ) {
+		return $args;
+	}
+
+	$minimum = koehlbrand_term_archive_min_posts();
+	$ids     = array();
+
+	foreach ( $terms as $term ) {
+		if ( (int) $term->count < $minimum ) {
+			$ids[] = (int) $term->term_id;
+		}
+	}
+
+	if ( $ids ) {
+		$vorhanden       = isset( $args['exclude'] ) ? (array) $args['exclude'] : array();
+		$args['exclude'] = array_merge( $vorhanden, $ids );
+	}
+
+	return $args;
+}
+add_filter( 'wp_sitemaps_taxonomies_query_args', 'koehlbrand_sitemap_skip_thin_terms', 10, 2 );
 
 /**
  * Autoren-Sitemap entfernen – die Archive sind noindex, also gehören sie
