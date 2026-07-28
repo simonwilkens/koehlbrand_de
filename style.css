@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.7.0
+Version: 1.7.1
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -458,6 +458,42 @@ footer .koehlbrand-brand__word {
 	.wp-block-post-featured-image.alignfull img {
 		aspect-ratio: 3 / 1;
 	}
+}
+
+
+/* -------------------------------------------------------------------------
+   Handlungsaufforderung im Aufmacher (`wp:read-more`)
+
+   Vorher stand hier ein `wp:button`. Der hat im Query-Loop zwei Fehler: Er ist
+   statisch und kennt die Beitrags-URL nicht – das `<a>` blieb ohne `href` und
+   war damit gar kein Link, weder klickbar noch fokussierbar. Und die im Block
+   gesetzten Farben erzeugen die Klassen `.has-accent-background-color` und
+   `.has-ink-color`, die WordPress mit `!important` ausgibt; die Hover-Regel aus
+   theme.json steht ohne und verlor jeden Zweikampf. Ergebnis: ein Knopf ohne
+   Ziel und ohne sichtbare Reaktion.
+
+   `wp:read-more` liefert die Beitrags-URL aus dem Loop. Die Optik entsteht
+   hier, nicht über Preset-Klassen – deshalb greift der Hover wieder. Die Werte
+   entsprechen `styles.elements.button` in der theme.json; wird die dort
+   geändert, gehört sie hier nachgezogen.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-cta {
+	display: inline-block;
+	padding: calc(0.667em + 2px) calc(1.333em + 2px);
+	border-radius: 2px;
+	background-color: var(--wp--preset--color--accent);
+	color: var(--wp--preset--color--ink);
+	font-family: var(--wp--preset--font-family--headline);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.koehlbrand-cta:hover,
+.koehlbrand-cta:focus-visible {
+	background-color: var(--wp--preset--color--primary);
+	color: var(--wp--preset--color--white);
+	text-decoration: none;
 }
 
 

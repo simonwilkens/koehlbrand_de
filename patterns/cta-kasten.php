@@ -24,8 +24,8 @@
 
 	<!-- wp:buttons -->
 	<div class="wp-block-buttons">
-		<!-- wp:button {"backgroundColor":"accent","textColor":"ink"} -->
-		<div class="wp-block-button"><a class="wp-block-button__link has-ink-color has-accent-background-color has-text-color has-background wp-element-button" href="#">Zur Übersicht</a></div>
+		<!-- wp:button -->
+		<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="#">Zur Übersicht</a></div>
 		<!-- /wp:button -->
 	</div>
 	<!-- /wp:buttons -->
