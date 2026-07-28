@@ -34,6 +34,7 @@ require_once get_theme_file_path( 'inc/analytics.php' );
  * Bausteine für die Verweildauer: Lesezeit, Inhaltsverzeichnis,
  * Artikel-Navigation und die Rangfolge der Empfehlungen am Artikelende.
  */
+require_once get_theme_file_path( 'inc/featured-credit.php' );
 require_once get_theme_file_path( 'inc/reading-time.php' );
 require_once get_theme_file_path( 'inc/toc.php' );
 require_once get_theme_file_path( 'inc/post-nav.php' );

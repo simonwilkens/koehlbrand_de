@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.3.5
+Version: 1.4.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -458,6 +458,34 @@ footer .koehlbrand-brand__word {
 	.wp-block-post-featured-image.alignfull img {
 		aspect-ratio: 3 / 1;
 	}
+}
+
+
+/* -------------------------------------------------------------------------
+   Bildnachweis unter dem Beitragsbild (Block koehlbrand/featured-credit)
+
+   `wp:post-featured-image` rendert keine Bildunterschrift. Ohne diese Zeile
+   stand der Credit nur in der Mediathek – für CC-BY und CC-BY-SA ist das keine
+   Namensnennung, weshalb Beitragsbilder bis dahin auf Quellen ohne
+   Attributionspflicht beschränkt waren.
+
+   Die Zeile ist bewusst leise: klein, Stahlblau, direkt unter dem Bild und mit
+   negativem oberen Abstand, damit sie am Bild klebt und nicht als erste
+   Textzeile des Artikels missverstanden wird. Der Block rendert nichts, wenn
+   das Medienobjekt keine Beschriftung hat – dann bleibt auch dieser Abstand
+   aus.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-featured-credit {
+	margin-top: var(--wp--preset--spacing--xs, 0.5rem);
+	margin-bottom: 0;
+	text-align: right;
+	font-style: italic;
+	line-height: 1.4;
+}
+
+.koehlbrand-featured-credit a {
+	color: inherit;
 }
 
 
