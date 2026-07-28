@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "koehlbrand/closure-table",
+	"title": "Sperrtermine (Tabelle)",
+	"category": "theme",
+	"icon": "calendar-alt",
+	"description": "Alle angekündigten Vollsperrungen aus derselben Terminliste wie der Seitenleisten-Kasten. Vergangene Termine fallen automatisch heraus.",
+	"textdomain": "koehlbrand",
+	"keywords": [ "sperrung", "termine", "tabelle", "elbtunnel", "köhlbrandbrücke" ],
+	"supports": {
+		"html": false,
+		"align": [ "wide" ],
+		"spacing": { "margin": true },
+		"typography": { "fontSize": true }
+	},
+	"editorScript": "koehlbrand-closure-table-editor"
+}

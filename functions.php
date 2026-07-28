@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Wird hochgezählt, wenn die Grundeinrichtung erneut laufen soll (z. B. weil
  * eine neue Rubrik dazugekommen ist).
  */
-define( 'KOEHLBRAND_SETUP_VERSION', '2' );
+define( 'KOEHLBRAND_SETUP_VERSION', '3' );
 
 /**
  * Ausgelagerte Bausteine. SEO liegt bewusst im Theme statt in einem Plugin
@@ -41,6 +41,7 @@ require_once get_theme_file_path( 'inc/reading-time.php' );
 require_once get_theme_file_path( 'inc/toc.php' );
 require_once get_theme_file_path( 'inc/post-nav.php' );
 require_once get_theme_file_path( 'inc/related-posts.php' );
+require_once get_theme_file_path( 'inc/closures.php' );
 
 /**
  * Die vier Rubriken des Portals. Slug => [ Name, Beschreibung ].
@@ -156,6 +157,7 @@ function koehlbrand_run_setup() {
 	koehlbrand_setup_permalinks();
 	koehlbrand_setup_required_pages();
 	koehlbrand_setup_close_comments();
+	koehlbrand_setup_sperrungen();
 
 	update_option( 'koehlbrand_setup_version', KOEHLBRAND_SETUP_VERSION );
 }

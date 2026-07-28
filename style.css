@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.6.0
+Version: 1.7.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -458,6 +458,105 @@ footer .koehlbrand-brand__word {
 	.wp-block-post-featured-image.alignfull img {
 		aspect-ratio: 3 / 1;
 	}
+}
+
+
+/* -------------------------------------------------------------------------
+   Sperrungen (Blöcke koehlbrand/next-closure und koehlbrand/closure-table)
+
+   Der Kasten steht in der Seitenleiste über dem Anzeigenplatz und ist der
+   einzige Baustein der Seite, der eine Warnung transportiert. Deshalb Amber als
+   Randmarkierung – die Signalfarbe der Marke – statt eines roten Kastens: Eine
+   angekündigte Wartungssperrung ist keine Gefahrenmeldung.
+
+   Kein Platzhalter für den leeren Zustand: Ohne künftigen Termin gibt PHP nichts
+   aus, und ohne Ausgabe greift auch keine Regel hier.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-closure {
+	border-left: 3px solid var(--wp--preset--color--accent);
+	background: var(--wp--preset--color--bg-alt);
+	padding: var(--wp--preset--spacing--md);
+	margin-bottom: var(--wp--preset--spacing--md);
+}
+
+.koehlbrand-closure > * {
+	margin: 0 0 0.375rem;
+}
+
+.koehlbrand-closure > :last-child {
+	margin-bottom: 0;
+}
+
+.koehlbrand-closure__label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--steel);
+}
+
+.koehlbrand-closure__bauwerk {
+	font-family: var(--wp--preset--font-family--headline);
+	font-size: 1.125rem;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.koehlbrand-closure__zeit {
+	font-variant-numeric: tabular-nums;
+	line-height: 1.4;
+}
+
+.koehlbrand-closure__warnung {
+	margin-top: 0.625rem;
+	padding-top: 0.625rem;
+	border-top: 1px solid var(--wp--preset--color--fog);
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.koehlbrand-closure__mehr {
+	font-size: 0.875rem;
+}
+
+/* Die Tabelle auf /sperrungen/ – scrollt auf schmalen Displays in sich selbst,
+   statt die Seite breiter zu machen. */
+.koehlbrand-closure-table {
+	margin: var(--wp--preset--spacing--md) 0;
+	overflow-x: auto;
+}
+
+.koehlbrand-closure-table table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.koehlbrand-closure-table caption {
+	margin-bottom: 0.5rem;
+	font-size: 0.8125rem;
+	color: var(--wp--preset--color--steel);
+	text-align: left;
+}
+
+.koehlbrand-closure-table th,
+.koehlbrand-closure-table td {
+	padding: 0.5rem 0.75rem 0.5rem 0;
+	border-bottom: 1px solid var(--wp--preset--color--fog);
+	text-align: left;
+	vertical-align: top;
+}
+
+.koehlbrand-closure-table td:last-child {
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.koehlbrand-closure-table__warnung {
+	color: var(--wp--preset--color--primary);
+	font-size: 0.8125rem;
+	font-weight: 600;
+	white-space: normal;
 }
 
 
