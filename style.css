@@ -7,7 +7,7 @@ Description: Redaktionelles Block-Theme für Köhlbrand.de – die Anlaufstelle 
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Version: 1.5.0
+Version: 1.6.0
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: koehlbrand
@@ -457,6 +457,117 @@ footer .koehlbrand-brand__word {
 @media (min-width: 900px) {
 	.wp-block-post-featured-image.alignfull img {
 		aspect-ratio: 3 / 1;
+	}
+}
+
+
+/* -------------------------------------------------------------------------
+   Einwilligungs-Banner (inc/consent.php)
+
+   Unten angeheftet statt bildschirmfüllend: Der Inhalt bleibt lesbar, während
+   die Entscheidung offen ist. Das ist Absicht – ohne Entscheidung wird nicht
+   gemessen, wer das Banner ignoriert, wählt also bereits die datensparsame
+   Variante. Eine Vollbild-Sperre würde nur Druck erzeugen, ohne etwas zu
+   schützen.
+
+   Beide Schaltflächen sind bewusst identisch gestaltet: gleiche Größe, gleicher
+   Kontrast, gleiche Reihenfolgeebene. Ein optisch schwächeres „Ablehnen“ gilt
+   der Datenschutzkonferenz als unwirksame Einwilligung – die Gleichbehandlung
+   ist hier also eine Anforderung und keine Gestaltungsfrage.
+   ---------------------------------------------------------------------- */
+
+.koehlbrand-consent {
+	position: fixed;
+	z-index: 999;
+	inset: auto 0 0 0;
+	padding: var(--wp--preset--spacing--sm, 1rem);
+	background: var(--wp--preset--color--ink, #16202b);
+	color: var(--wp--preset--color--sand, #f2ece2);
+	box-shadow: 0 -2px 16px rgb(0 0 0 / 25%);
+}
+
+.koehlbrand-consent[hidden] {
+	display: none;
+}
+
+.koehlbrand-consent__box {
+	max-width: var(--wp--style--global--wide-size, 1200px);
+	margin-inline: auto;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.koehlbrand-consent__titel {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--headline);
+	font-size: 1.0625rem;
+	line-height: 1.3;
+}
+
+.koehlbrand-consent__text,
+.koehlbrand-consent__fuss {
+	margin: 0;
+	font-size: 0.875rem;
+	line-height: 1.55;
+}
+
+.koehlbrand-consent__fuss {
+	color: var(--wp--preset--color--fog, #9fb0bd);
+	font-size: 0.8125rem;
+}
+
+.koehlbrand-consent__text a {
+	color: inherit;
+}
+
+.koehlbrand-consent__knoepfe {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.625rem;
+}
+
+.koehlbrand-consent__knopf {
+	flex: 1 1 12rem;
+	min-height: 2.75rem; /* Mindestgröße für Touch-Ziele */
+	padding: 0.625rem 1.25rem;
+	border: 2px solid var(--wp--preset--color--sand, #f2ece2);
+	border-radius: 2px;
+	background: var(--wp--preset--color--sand, #f2ece2);
+	color: var(--wp--preset--color--ink, #16202b);
+	font-family: inherit;
+	font-size: 0.9375rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.koehlbrand-consent__knopf:hover,
+.koehlbrand-consent__knopf:focus-visible {
+	background: var(--wp--preset--color--accent, #e39a3b);
+	border-color: var(--wp--preset--color--accent, #e39a3b);
+}
+
+@media (min-width: 700px) {
+	.koehlbrand-consent__box {
+		grid-template-columns: minmax(0, 1fr) auto;
+		column-gap: var(--wp--preset--spacing--md, 1.5rem);
+	}
+
+	.koehlbrand-consent__titel { grid-area: 1 / 1; }
+	.koehlbrand-consent__text  { grid-area: 2 / 1; }
+	.koehlbrand-consent__fuss  { grid-area: 3 / 1; }
+
+	.koehlbrand-consent__knoepfe {
+		grid-area: 1 / 2 / 4 / 3;
+		flex-direction: column;
+		justify-content: center;
+		min-width: 13rem;
+	}
+
+	/* Ohne das ziehen die Knöpfe die drei Textzeilen auseinander: `flex: 1`
+	   lässt sie die volle Höhe der übersprungenen Zeilen einnehmen, und die
+	   Zeilenhöhe richtet sich wiederum nach ihnen. */
+	.koehlbrand-consent__knopf {
+		flex: 0 0 auto;
 	}
 }
 

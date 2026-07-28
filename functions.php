@@ -29,6 +29,8 @@ require_once get_theme_file_path( 'inc/seo-schema.php' );
 require_once get_theme_file_path( 'inc/breadcrumbs.php' );
 require_once get_theme_file_path( 'inc/ads.php' );
 require_once get_theme_file_path( 'inc/analytics.php' );
+// Nach analytics.php: consent.php fragt koehlbrand_ga4_id() ab.
+require_once get_theme_file_path( 'inc/consent.php' );
 
 /**
  * Bausteine für die Verweildauer: Lesezeit, Inhaltsverzeichnis,

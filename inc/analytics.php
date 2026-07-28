@@ -7,22 +7,16 @@
  * wird über die REST API automatisiert bespielt, jede zusätzliche Plugin-Ebene
  * wäre ein weiterer Ort, an dem die Pipeline Einstellungen pflegen müsste.
  *
- * **Kein Consent-Banner.** Entscheidung vom 26.07.2026: GA4 läuft in der
- * Entwicklungs- und Testphase bewusst ohne Cookie-Consent. Das ist eine
- * Übergangslösung – vor dem Produktivbetrieb steht ein Wechsel der
- * Tracking-Lösung samt sauberer Consent-Umsetzung an (siehe
- * technik/architektur-plan.md). Wer bis dahin doch eine CMP einhängt: Der
- * Hook `koehlbrand_cmp` (inc/ads.php, wp_head-Priorität 1) läuft vor diesem
- * Snippet, das Consent-Signal ist also vor gtag.js da.
+ * **Das Laden übernimmt seit v1.6.0 `inc/consent.php`.** Diese Datei entscheidet
+ * nur noch, *ob* eine Messung überhaupt in Frage kommt (gültige Mess-ID,
+ * passender Seitentyp); geladen wird gtag.js ausschließlich nach erteilter
+ * Einwilligung, und zwar clientseitig. Der frühere Head-Ausdruck ist ersatzlos
+ * entfallen – er hätte bei einer zwischengespeicherten Seite den Zustand des
+ * ersten Besuchers an alle folgenden weitergegeben.
  *
- * Zwei Dinge, die vor dem Livegang trotzdem passen müssen:
- *
- * 1. Die **Datenschutzerklärung** muss GA4 benennen (Verarbeitung, Empfänger,
- *    US-Transfer, Widerspruch). Ihr Abschnitt 5 sagt bislang das Gegenteil –
- *    „derzeit keine Analyse-Werkzeuge" –, deshalb der Backend-Hinweis unten.
- * 2. In der GA4-Property gehört die **IP-Anonymisierung** geprüft; GA4 kürzt
- *    IP-Adressen zwar von sich aus, das ist aber Property-Einstellung und
- *    nichts, was dieses Snippet steuern kann.
+ * Offen bleibt: In der GA4-Property gehört die **IP-Anonymisierung** geprüft;
+ * GA4 kürzt IP-Adressen zwar von sich aus, das ist aber Property-Einstellung
+ * und nichts, was das Theme steuern kann.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,59 +68,18 @@ function koehlbrand_ga4_enabled() {
 }
 
 /**
- * Das gtag.js-Snippet in den `<head>`.
+ * Kein Preconnect zu den Google-Hosts mehr.
  *
- * Bewusst direkt ausgegeben statt über `wp_enqueue_script()`: Der Loader ist
- * asynchron, das Konfigurations-Snippet muss aber unmittelbar dahinter stehen.
- * WordPress stuft ein Skript mit angehängtem `after`-Inline-Code auf
- * "blocking" zurück – das `async` fiele also still weg und gtag.js stünde
- * render-blockierend im Kopf.
+ * Ein `preconnect` ist kein bloßer Hinweis: Der Browser baut die Verbindung
+ * tatsächlich auf, samt DNS-Auflösung und TLS-Handshake – und überträgt dabei
+ * die IP-Adresse an Google. Vor einer Einwilligung ist das genau das, was nicht
+ * passieren darf. Nach der Einwilligung wäre es zulässig, brächte aber wenig:
+ * Das Skript wird ohnehin erst durch das Steuer-Skript im Fußbereich angefragt,
+ * der Vorlauf zum Verbindungsaufbau ist dann längst verstrichen.
  *
- * Priorität 3: nach dem CMP-Slot (1) und dem AdSense-Verifizierungs-Tag (2),
- * aber vor `wp_print_head_scripts()` (9).
+ * Deshalb ersatzlos gestrichen. Die Funktion bleibt als Notiz stehen, damit die
+ * Überlegung nicht in sechs Monaten als „vergessen“ nachgeholt wird.
  */
-function koehlbrand_ga4_snippet() {
-	if ( ! koehlbrand_ga4_enabled() ) {
-		return;
-	}
-
-	$id = koehlbrand_ga4_id();
-
-	wp_print_script_tag(
-		array(
-			'async' => true,
-			'src'   => 'https://www.googletagmanager.com/gtag/js?id=' . rawurlencode( $id ),
-		)
-	);
-
-	echo wp_get_inline_script_tag(
-		sprintf(
-			"window.dataLayer = window.dataLayer || [];\n" .
-			"function gtag(){dataLayer.push(arguments);}\n" .
-			"gtag('js', new Date());\n" .
-			"gtag('config', '%s');\n",
-			esc_js( $id )
-		)
-	);
-}
-add_action( 'wp_head', 'koehlbrand_ga4_snippet', 3 );
-
-/**
- * Verbindungsaufbau zu den Tag-Hosts vorziehen – spart pro Host DNS-Lookup und
- * TLS-Handshake, bevor der erste Messtreffer rausgeht. `googletagmanager.com`
- * liefert das Skript, `google-analytics.com` nimmt die Treffer entgegen.
- */
-function koehlbrand_ga4_resource_hints( $hints, $relation ) {
-	if ( 'preconnect' !== $relation || ! koehlbrand_ga4_enabled() ) {
-		return $hints;
-	}
-
-	$hints[] = 'https://www.googletagmanager.com';
-	$hints[] = 'https://www.google-analytics.com';
-
-	return $hints;
-}
-add_filter( 'wp_resource_hints', 'koehlbrand_ga4_resource_hints', 10, 2 );
 
 /**
  * Hinweis im Backend, solange die Datenschutzerklärung GA4 nicht benennt.
